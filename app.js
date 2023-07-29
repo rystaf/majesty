@@ -2139,7 +2139,8 @@
               return x.OnFire ? "\u2B1B\uFE0F" : "\u{1F7E9}";
             }).join("")).join("\n");
             let text = `I made it to level ${state2.Level} in ${state2.Moves} moves!
-${tiles}`;
+${tiles}
+${window.location.href}`;
             if (navigator?.share) {
               navigator.share({ text });
             } else if (navigator?.clipboard) {
