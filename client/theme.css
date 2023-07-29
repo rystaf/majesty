@@ -1,0 +1,374 @@
+body {
+  background-color: black;
+  font-family: sans-serif;
+  color: white;
+}
+
+.eligible:hover {
+  cursor: pointer;
+  border-color: #A7F070
+}
+
+.eligible {
+  padding: 2px;
+  border: 5px solid #F4F4F4;
+}
+
+.smoke {
+  background-image: url("images/smoke.gif");
+}
+
+.nice {
+  background-image: url("images/nice.png");
+}
+
+.dead {
+  background-image: url("images/over.png");
+}
+.over {
+  background-image: url("images/over.gif");
+}
+
+.skull {
+  background-image: url("images/void.png");
+}
+.play {
+  -webkit-mask-size: contain;
+  -webkit-mask-image: url("images/play.svg");
+  background-color: #FFF
+}
+.undo {
+  -webkit-mask-size: contain;
+  -webkit-mask-image: url("images/play.svg");
+  background-color: #FFF
+}
+
+.mask-no-repeat {
+  -webkit-mask-repeat: no-repeat;
+}
+
+.north {
+  background-image: url("images/arrow.svg");
+}
+.ne {
+  background-image: url("images/arrow.svg");
+  transform: rotate(45deg);
+}
+.nw {
+  background-image: url("images/arrow.svg");
+  transform: rotate(-45deg);
+}
+.se {
+  background-image: url("images/arrow.svg");
+  transform: rotate(135deg);
+}
+.sw {
+  background-image: url("images/arrow.svg");
+  transform: rotate(-135deg);
+}
+.south {
+  background-image: url("images/arrow.svg");
+  transform: rotate(-180deg);
+}
+
+.east {
+  background-image: url("images/arrow.svg");
+  transform: rotate(90deg);
+}
+.west {
+  background-image: url("images/arrow.svg");
+  transform: rotate(-90deg);
+}
+
+.tile.cottage {
+  background-image: url("images/cottage.jpg");
+}
+.thecottage {
+  background-image: url("images/cottage.png");
+}
+.thecottage.onfire {
+  background-image: url("images/cottage.onfire.png");
+}
+.thecottage.darken{
+  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('images/cottage.png');
+  background-position:center center;
+}
+
+.tile.cottage.onfire {
+  background-image: url("images/cottage.onfire.jpg");
+}
+
+.tree {
+  background-image: url("images/tree.jpg");
+}
+
+.tree.onfire {
+  background-image: url("images/tree.onfire.jpg");
+}
+
+.plain {
+  background-image: url("images/plain.jpg");
+}
+
+.plain.onfire {
+  background-image: url("images/plain.onfire.jpg");
+}
+
+.tree:nth-child(9n+2) {
+  background-image: url("images/tree2.jpg");
+}
+
+.tree:nth-child(9n+2).onfire {
+  background-image: url("images/tree2.onfire.jpg");
+}
+
+.tree:nth-child(7n) {
+  background-image: url("images/shrub.jpg");
+}
+
+.tree:nth-child(7n).onfire {
+  background-image: url("images/shrub.onfire.jpg");
+}
+
+.forest {
+  background-image: url("images/forest.jpg");
+}
+
+.forest.onfire {
+  background-image: url("images/forest.onfire.jpg");
+}
+
+.tunnel {
+  background-image: url("images/tunnel.jpg");
+}
+
+.tile.tunnel.onfire {
+  background-image: url("images/tunnel.onfire.jpg");
+}
+
+.rock {
+  background-image: url("images/rock.jpg");
+}
+
+.tile.rock.onfire {
+  background-image: url("images/rock.onfire.jpg");
+}
+
+.mountain {
+  background-image: url("images/mountain.jpg");
+}
+.hide {
+  background-image: url("images/hide.png");
+}
+.hide.onfire {
+  background-image: url("images/hide.onfire.png");
+}
+
+.tile.mountain.onfire {
+  background-image: url("images/mountain.onfire.jpg");
+}
+
+.lake {
+  background-image: url("images/lake.jpg");
+}
+
+.tile.lake.onfire {
+  background-image: url("images/lake.onfire.jpg");
+}
+
+.flowers {
+  background-image: url("images/flowers.jpg");
+}
+
+.flowers.onfire {
+  background-image: url("images/flowers.onfire.jpg");
+}
+
+.stump {
+  background-image: url("images/stump.jpg");
+}
+
+.stump.onfire {
+  background-image: url("images/stump.onfire.jpg");
+}
+
+.dragon {
+  background-image: url("images/trogdor.png");
+}
+.dragon.onfire {
+  background-image: url("images/trogdor.onfire.png");
+}
+
+.hidden  {
+  transform: rotate(90deg);
+}
+
+.visitor {
+  position:absolute;
+  height: 10px;
+  z-index: 50 !important;
+}
+.visitor.p {
+  background-color: #824b07;
+}
+.visitor.West {
+  left: 0;
+}
+.visitor.North {
+  top: 0;
+}
+.visitor.p.North {
+  left: 27px;
+  width: 10px;
+  height: 30px;
+}
+.visitor.p.South {
+  left: 27px;
+  width: 10px;
+  height: 78px;
+  top: 83px;
+}
+.visitor.p.East {
+  top: 50%;
+  left: 27px;
+  width: 170px;
+}
+.visitor.p.SE {
+  top: 73%;
+  left: 40px;
+  width: 186px;
+  transform: rotate(30deg);
+}
+.visitor.p.NW {
+  top: 1px;
+  left: -15px;
+  width: 45px;
+  transform: rotate(30deg);
+}
+.visitor.p.West {
+  top: 50%;
+  width: 27px;
+}
+.visitor.k {
+  background-color: #75aadf;
+}
+.visitor.a {
+  background-color: green;
+}
+.visitor.k.West, .visitor.a.West{
+  top: 50%;
+  left: 0px;
+  width: 160px;
+  height: 10px;
+}
+.visitor.k.East, .visitor.a.East {
+  top: 50%;
+  left: 160px;
+  width: 39px;
+  height: 10px;
+}
+.visitor.k.North, .visitor.a.North {
+  top: 0;
+  left: 159px;
+  width: 10px;
+  height: 90px;
+}
+.visitor.k.South, .visitor.a.South {
+  top: 50%;
+  left: 159px;
+  width: 10px;
+  height: 80px;
+}
+
+.peasant {
+  background-image: url("images/peasant.png");
+}
+
+.peasant.onfire {
+  background-image: url("images/peasant.onfire.png");
+}
+
+.knight {
+  background-image: url("images/knight.png");
+}
+
+.knight.hammer {
+  background-image: url("images/troghammer.png");
+}
+
+.archer {
+  background-image: url("images/archer.png");
+}
+.archer.vertical {
+  background-image: url("images/archer.vertical.png");
+}
+
+#trogmeter {
+  display: flex;
+  flex-direction: row;
+}
+
+#trogmeter div {
+  width: 20px;
+  height: 20px;
+  border: 2px solid gray;
+  margin: 2px;
+}
+
+
+#movement {
+  display: none;
+  width: 130px;
+}
+
+#movement input {
+  margin: 1px 0;
+}
+
+#movement div:nth-child(odd){
+  display:flex;
+  justify-content: space-evenly;
+}
+
+#movement div:nth-child(even){
+  display:flex;
+  justify-content: space-between;
+}
+
+#controls .Actions {
+  display: none;
+  flex-direction: column;
+}
+
+.moves {
+  display: none;
+  margin: 2px;
+  color: white;
+  min-height: 75px;
+}
+.time {
+  margin: 5px 0;
+}
+.game {
+  display: none;
+}
+
+.burntile {
+  background-image: url("images/burntile.png");
+}
+.chomp {
+  background-image: url("images/chomp.png");
+}
+.burrow {
+  background-image: url("images/burrow.png");
+}
+
+.discharged {
+  border-color: black !important;
+  background-color: rgb(130,130,141) !important;
+  color: #151515 !important;
+  cursor: not-allowed !important;
+}
+.discharged div {
+  background-color: unset !important;
+}

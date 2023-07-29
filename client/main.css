@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
+  .btn-primary {
+    @apply py-px px-2 font-semibold border-2 border-gray-300 hover:border-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer focus:ring-opacity-75 
+  }
+  .cardinal {
+    @apply cursor-pointer font-0 h-12 w-12 bg-cover
+  }
+  .btn-action {
+    @apply cursor-pointer m-1 border-2 border-gray-200 h-14 w-14 rounded-full
+  }
+}
+.btn-primary {
+  font-size: .75vw;
+}
+.4xl {
+  size: 2.441rem
+}
+.flip-x {
+  transform: scaleX(-1)
+}
+.bg-stretch {
+  background-size: 100% 100%
+}
+.font-0 {
+  font-size:0;
+}
+.fire {
+  color: #FF0000;
+	animation: gradient 5s infinite;
+}
+
+@keyframes gradient {
+  0% {
+    color: #FF0000;
+  }
+	50% {
+		color: #FFFF00;
+	}
+	100% {
+		color: #FF0000;
+	}
+}
+.text-stroke {
+  -webkit-text-stroke: 2px black;
+}
+.text-shadow {
+  text-shadow: -2px 2px #656564;
+}
+.delay-hide {
+  opacity: 0;
+  animation:2s fadeOut;
+  animation-iteration-count: 1;
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80%{
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.h-screen-inner {
+  height: calc(var(--vh, 1vh) * 100);
+}
+.dragon.dead {
+  transform: rotate(90deg) scaleX(-1);
+}
