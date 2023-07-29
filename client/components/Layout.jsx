@@ -142,7 +142,7 @@ class Nice {
                   }
                   return x.OnFire ? "⬛️" : "🟩"
                 }).join('')).join('\n')
-                let text = `I made it to level ${state.Level} in ${state.Moves} moves!\n${tiles}`
+                let text = `I made it to level ${state.Level} in ${state.Moves} moves!\n${tiles}\n${window.location.href}`
                 if (navigator?.share) {
                   navigator.share({ text })
                 } else if (navigator?.clipboard) {
