@@ -1,0 +1,327 @@
+/* client/theme.css */
+body {
+  background-color: black;
+  font-family: sans-serif;
+  color: white;
+}
+.eligible:hover {
+  cursor: pointer;
+  border-color: #A7F070;
+}
+.eligible {
+  padding: 2px;
+  border: 5px solid #F4F4F4;
+}
+.smoke {
+  background-image: url(./smoke-ANEAZTJU.gif);
+}
+.nice {
+  background-image: url(./nice-CWEVSNXR.png);
+}
+.dead {
+  background-image: url(./over-H6XK2A2K.png);
+}
+.over {
+  background-image: url(./over-5GKPQ52Z.gif);
+}
+.skull {
+  background-image: url(./void-L44FFADV.png);
+}
+.play {
+  -webkit-mask-size: contain;
+  -webkit-mask-image: url(./play-HIOTSHCO.svg);
+  background-color: #FFF;
+}
+.undo {
+  -webkit-mask-size: contain;
+  -webkit-mask-image: url(./play-HIOTSHCO.svg);
+  background-color: #FFF;
+}
+.mask-no-repeat {
+  -webkit-mask-repeat: no-repeat;
+}
+.north {
+  background-image: url(./arrow-LAAJ257S.svg);
+}
+.ne {
+  background-image: url(./arrow-LAAJ257S.svg);
+  transform: rotate(45deg);
+}
+.nw {
+  background-image: url(./arrow-LAAJ257S.svg);
+  transform: rotate(-45deg);
+}
+.se {
+  background-image: url(./arrow-LAAJ257S.svg);
+  transform: rotate(135deg);
+}
+.sw {
+  background-image: url(./arrow-LAAJ257S.svg);
+  transform: rotate(-135deg);
+}
+.south {
+  background-image: url(./arrow-LAAJ257S.svg);
+  transform: rotate(-180deg);
+}
+.east {
+  background-image: url(./arrow-LAAJ257S.svg);
+  transform: rotate(90deg);
+}
+.west {
+  background-image: url(./arrow-LAAJ257S.svg);
+  transform: rotate(-90deg);
+}
+.tile.cottage {
+  background-image: url(./cottage-SSA2MACN.jpg);
+}
+.thecottage {
+  background-image: url(./cottage-3I565HSJ.png);
+}
+.thecottage.onfire {
+  background-image: url(./cottage.onfire-2RCBATF3.png);
+}
+.thecottage.darken {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(./cottage-3I565HSJ.png);
+  background-position: center center;
+}
+.tile.cottage.onfire {
+  background-image: url(./cottage.onfire-PV4HMIZH.jpg);
+}
+.tree {
+  background-image: url(./tree-OZVQOED2.jpg);
+}
+.tree.onfire {
+  background-image: url(./tree.onfire-BSELXSZK.jpg);
+}
+.plain {
+  background-image: url(./plain-Z2WKYOVA.jpg);
+}
+.plain.onfire {
+  background-image: url(./plain.onfire-6GSVQCRK.jpg);
+}
+.tree:nth-child(9n+2) {
+  background-image: url(./tree2-NIZO7KJZ.jpg);
+}
+.tree:nth-child(9n+2).onfire {
+  background-image: url(./tree2.onfire-WSMBDBIY.jpg);
+}
+.tree:nth-child(7n) {
+  background-image: url(./shrub-CFI64GR2.jpg);
+}
+.tree:nth-child(7n).onfire {
+  background-image: url(./shrub.onfire-5GTHMOMT.jpg);
+}
+.forest {
+  background-image: url(./forest-PCGWKUUN.jpg);
+}
+.forest.onfire {
+  background-image: url(./forest.onfire-OOEHM3FV.jpg);
+}
+.tunnel {
+  background-image: url(./tunnel-4MQBX6QJ.jpg);
+}
+.tile.tunnel.onfire {
+  background-image: url(./tunnel.onfire-QQVGSRNZ.jpg);
+}
+.rock {
+  background-image: url(./rock-OU3W2GNS.jpg);
+}
+.tile.rock.onfire {
+  background-image: url(./rock.onfire-DY6MAI7M.jpg);
+}
+.mountain {
+  background-image: url(./mountain-SY4NDEAJ.jpg);
+}
+.hide {
+  background-image: url(./hide-MHKVMO4G.png);
+}
+.hide.onfire {
+  background-image: url(./hide.onfire-EG2NJBT6.png);
+}
+.tile.mountain.onfire {
+  background-image: url(./mountain.onfire-2GCPZD2T.jpg);
+}
+.lake {
+  background-image: url(./lake-UMYL7SJ6.jpg);
+}
+.tile.lake.onfire {
+  background-image: url(./lake.onfire-MWVYPRIU.jpg);
+}
+.flowers {
+  background-image: url(./flowers-U7NPSNA4.jpg);
+}
+.flowers.onfire {
+  background-image: url(./flowers.onfire-3SBUNKY2.jpg);
+}
+.stump {
+  background-image: url(./stump-PWUYYIXH.jpg);
+}
+.stump.onfire {
+  background-image: url(./stump.onfire-TJ5X2MQE.jpg);
+}
+.dragon {
+  background-image: url(./trogdor-SX4PA7VA.png);
+}
+.dragon.onfire {
+  background-image: url(./trogdor.onfire-ZWQYIWEJ.png);
+}
+.hidden {
+  transform: rotate(90deg);
+}
+.visitor {
+  position: absolute;
+  height: 10px;
+  z-index: 50 !important;
+}
+.visitor.p {
+  background-color: #824b07;
+}
+.visitor.West {
+  left: 0;
+}
+.visitor.North {
+  top: 0;
+}
+.visitor.p.North {
+  left: 27px;
+  width: 10px;
+  height: 30px;
+}
+.visitor.p.South {
+  left: 27px;
+  width: 10px;
+  height: 78px;
+  top: 83px;
+}
+.visitor.p.East {
+  top: 50%;
+  left: 27px;
+  width: 170px;
+}
+.visitor.p.SE {
+  top: 73%;
+  left: 40px;
+  width: 186px;
+  transform: rotate(30deg);
+}
+.visitor.p.NW {
+  top: 1px;
+  left: -15px;
+  width: 45px;
+  transform: rotate(30deg);
+}
+.visitor.p.West {
+  top: 50%;
+  width: 27px;
+}
+.visitor.k {
+  background-color: #75aadf;
+}
+.visitor.a {
+  background-color: green;
+}
+.visitor.k.West,
+.visitor.a.West {
+  top: 50%;
+  left: 0px;
+  width: 160px;
+  height: 10px;
+}
+.visitor.k.East,
+.visitor.a.East {
+  top: 50%;
+  left: 160px;
+  width: 39px;
+  height: 10px;
+}
+.visitor.k.North,
+.visitor.a.North {
+  top: 0;
+  left: 159px;
+  width: 10px;
+  height: 90px;
+}
+.visitor.k.South,
+.visitor.a.South {
+  top: 50%;
+  left: 159px;
+  width: 10px;
+  height: 80px;
+}
+.peasant {
+  background-image: url(./peasant-VWSYVLBB.png);
+}
+.peasant.onfire {
+  background-image: url(./peasant.onfire-A3FUUWYW.png);
+}
+.knight {
+  background-image: url(./knight-NOVZOPRM.png);
+}
+.knight.hammer {
+  background-image: url(./troghammer-BLDE4M54.png);
+}
+.archer {
+  background-image: url(./archer-T3F22343.png);
+}
+.archer.vertical {
+  background-image: url(./archer.vertical-4AR4O6W6.png);
+}
+#trogmeter {
+  display: flex;
+  flex-direction: row;
+}
+#trogmeter div {
+  width: 20px;
+  height: 20px;
+  border: 2px solid gray;
+  margin: 2px;
+}
+#movement {
+  display: none;
+  width: 130px;
+}
+#movement input {
+  margin: 1px 0;
+}
+#movement div:nth-child(odd) {
+  display: flex;
+  justify-content: space-evenly;
+}
+#movement div:nth-child(even) {
+  display: flex;
+  justify-content: space-between;
+}
+#controls .Actions {
+  display: none;
+  flex-direction: column;
+}
+.moves {
+  display: none;
+  margin: 2px;
+  color: white;
+  min-height: 75px;
+}
+.time {
+  margin: 5px 0;
+}
+.game {
+  display: none;
+}
+.burntile {
+  background-image: url(./burntile-HMG3C752.png);
+}
+.chomp {
+  background-image: url(./chomp-5HCBKCL3.png);
+}
+.burrow {
+  background-image: url(./burrow-ARYROYW5.png);
+}
+.discharged {
+  border-color: black !important;
+  background-color: rgb(130, 130, 141) !important;
+  color: #151515 !important;
+  cursor: not-allowed !important;
+}
+.discharged div {
+  background-color: unset !important;
+}
