@@ -2013,9 +2013,9 @@ ${window.location.href}`;
       this.Dragon.Move(dest);
       this.MoveEnemies();
       this.SpawnPeasants();
+      this.CheckDamage();
       this.Burn();
       localStorage.setItem("state", JSON.stringify(this));
-      return this.CheckDamage();
     }
     Rage(AP) {
       this.Dragon.Move();
@@ -2098,7 +2098,7 @@ ${window.location.href}`;
   // client/ws.js
   var WSConnection = class {
     constructor(config) {
-      console.log("new ws", config);
+      if (window.location.hash != "#dev") return;
       this.t = 800;
       this.port = config?.port || window.location.port;
       this.onmessage = config?.onmessage;
@@ -2126,7 +2126,7 @@ ${window.location.href}`;
   };
 
   // client/app.js
-  var localState = false;
+  var localState = window.location.hash == "#dev" && JSON.parse(localStorage.getItem("state"));
   var state = localState ? new Game(localState) : new Game(
     {},
     [
@@ -2169,12 +2169,7 @@ ${window.location.href}`;
   );
   new WSConnection({
     port: 8083,
-    onmessage: (msg) => {
-      if (msg.data) {
-        console.log("reload:", msg.data);
-        window.location.reload();
-      }
-    }
+    onmessage: (msg) => window.location.reload()
   });
   import_mithril4.default.mount(document.getElementById("app"), {
     view: () => (0, import_mithril4.default)(Layout, { state })
