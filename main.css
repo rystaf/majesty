@@ -1111,6 +1111,14 @@ video {
   animation: gradient 5s infinite;
 }
 
+.tile {
+  cursor: pointer;
+}
+
+.tile.onfire {
+  cursor: unset;
+}
+
 @keyframes gradient {
   0% {
     color: #FF0000;

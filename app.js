@@ -30,15 +30,12 @@
     "node_modules/mithril/render/vnode.js"(exports, module) {
       "use strict";
       function Vnode(tag, key, attrs, children, text, dom) {
-        return { tag, key, attrs, children, text, dom, domSize: void 0, state: void 0, events: void 0, instance: void 0 };
+        return { tag, key, attrs, children, text, dom, is: void 0, domSize: void 0, state: void 0, events: void 0, instance: void 0 };
       }
       Vnode.normalize = function(node) {
-        if (Array.isArray(node))
-          return Vnode("[", void 0, void 0, Vnode.normalizeChildren(node), void 0, void 0);
-        if (node == null || typeof node === "boolean")
-          return null;
-        if (typeof node === "object")
-          return node;
+        if (Array.isArray(node)) return Vnode("[", void 0, void 0, Vnode.normalizeChildren(node), void 0, void 0);
+        if (node == null || typeof node === "boolean") return null;
+        if (typeof node === "object") return node;
         return Vnode("#", void 0, void 0, String(node), void 0, void 0);
       };
       Vnode.normalizeChildren = function(input) {
@@ -77,12 +74,10 @@
         }
         if (arguments.length === start + 1) {
           children = arguments[start];
-          if (!Array.isArray(children))
-            children = [children];
+          if (!Array.isArray(children)) children = [children];
         } else {
           children = [];
-          while (start < arguments.length)
-            children.push(arguments[start++]);
+          while (start < arguments.length) children.push(arguments[start++]);
         }
         return Vnode("", attrs.key, attrs, children);
       };
@@ -105,35 +100,27 @@
       var hyperscriptVnode = require_hyperscriptVnode();
       var hasOwn = require_hasOwn();
       var selectorParser = /(?:(^|#|\.)([^#\.\[\]]+))|(\[(.+?)(?:\s*=\s*("|'|)((?:\\["'\]]|.)*?)\5)?\])/g;
-      var selectorCache = {};
+      var selectorCache = /* @__PURE__ */ Object.create(null);
       function isEmpty(object) {
-        for (var key in object)
-          if (hasOwn.call(object, key))
-            return false;
+        for (var key in object) if (hasOwn.call(object, key)) return false;
         return true;
       }
       function compileSelector(selector) {
         var match, tag = "div", classes = [], attrs = {};
         while (match = selectorParser.exec(selector)) {
           var type = match[1], value = match[2];
-          if (type === "" && value !== "")
-            tag = value;
-          else if (type === "#")
-            attrs.id = value;
-          else if (type === ".")
-            classes.push(value);
+          if (type === "" && value !== "") tag = value;
+          else if (type === "#") attrs.id = value;
+          else if (type === ".") classes.push(value);
           else if (match[3][0] === "[") {
             var attrValue = match[6];
-            if (attrValue)
-              attrValue = attrValue.replace(/\\(["'])/g, "$1").replace(/\\\\/g, "\\");
-            if (match[4] === "class")
-              classes.push(attrValue);
-            else
-              attrs[match[4]] = attrValue === "" ? attrValue : attrValue || true;
+            if (attrValue) attrValue = attrValue.replace(/\\(["'])/g, "$1").replace(/\\\\/g, "\\");
+            if (match[4] === "class") classes.push(attrValue);
+            else attrs[match[4]] = attrValue === "" ? attrValue : attrValue || true;
           }
         }
-        if (classes.length > 0)
-          attrs.className = classes.join(" ");
+        if (classes.length > 0) attrs.className = classes.join(" ");
+        if (isEmpty(attrs)) attrs = null;
         return selectorCache[selector] = { tag, attrs };
       }
       function execSelector(state2, vnode) {
@@ -141,30 +128,18 @@
         var hasClass = hasOwn.call(attrs, "class");
         var className = hasClass ? attrs.class : attrs.className;
         vnode.tag = state2.tag;
-        vnode.attrs = {};
-        if (!isEmpty(state2.attrs) && !isEmpty(attrs)) {
-          var newAttrs = {};
-          for (var key in attrs) {
-            if (hasOwn.call(attrs, key))
-              newAttrs[key] = attrs[key];
-          }
-          attrs = newAttrs;
+        if (state2.attrs != null) {
+          attrs = Object.assign({}, state2.attrs, attrs);
+          if (className != null || state2.attrs.className != null) attrs.className = className != null ? state2.attrs.className != null ? String(state2.attrs.className) + " " + String(className) : className : state2.attrs.className != null ? state2.attrs.className : null;
+        } else {
+          if (className != null) attrs.className = className;
         }
-        for (var key in state2.attrs) {
-          if (hasOwn.call(state2.attrs, key) && key !== "className" && !hasOwn.call(attrs, key)) {
-            attrs[key] = state2.attrs[key];
-          }
+        if (hasClass) attrs.class = null;
+        if (state2.tag === "input" && hasOwn.call(attrs, "type")) {
+          attrs = Object.assign({ type: attrs.type }, attrs);
         }
-        if (className != null || state2.attrs.className != null)
-          attrs.className = className != null ? state2.attrs.className != null ? String(state2.attrs.className) + " " + String(className) : className : state2.attrs.className != null ? state2.attrs.className : null;
-        if (hasClass)
-          attrs.class = null;
-        for (var key in attrs) {
-          if (hasOwn.call(attrs, key) && key !== "key") {
-            vnode.attrs = attrs;
-            break;
-          }
-        }
+        vnode.is = attrs.is;
+        vnode.attrs = attrs;
         return vnode;
       }
       function hyperscript(selector) {
@@ -174,8 +149,7 @@
         var vnode = hyperscriptVnode.apply(1, arguments);
         if (typeof selector === "string") {
           vnode.children = Vnode.normalizeChildren(vnode.children);
-          if (selector !== "[")
-            return execSelector(selectorCache[selector] || compileSelector(selector), vnode);
+          if (selector !== "[") return execSelector(selectorCache[selector] || compileSelector(selector), vnode);
         }
         vnode.tag = selector;
         return vnode;
@@ -190,8 +164,7 @@
       "use strict";
       var Vnode = require_vnode();
       module.exports = function(html) {
-        if (html == null)
-          html = "";
+        if (html == null) html = "";
         return Vnode("<", void 0, void 0, html, void 0, void 0);
       };
     }
@@ -223,170 +196,28 @@
     }
   });
 
-  // node_modules/mithril/promise/polyfill.js
-  var require_polyfill = __commonJS({
-    "node_modules/mithril/promise/polyfill.js"(exports, module) {
+  // node_modules/mithril/render/domFor.js
+  var require_domFor = __commonJS({
+    "node_modules/mithril/render/domFor.js"(exports, module) {
       "use strict";
-      var PromisePolyfill = function(executor) {
-        if (!(this instanceof PromisePolyfill))
-          throw new Error("Promise must be called with 'new'.");
-        if (typeof executor !== "function")
-          throw new TypeError("executor must be a function.");
-        var self = this, resolvers = [], rejectors = [], resolveCurrent = handler(resolvers, true), rejectCurrent = handler(rejectors, false);
-        var instance = self._instance = { resolvers, rejectors };
-        var callAsync = typeof setImmediate === "function" ? setImmediate : setTimeout;
-        function handler(list, shouldAbsorb) {
-          return function execute(value) {
-            var then;
-            try {
-              if (shouldAbsorb && value != null && (typeof value === "object" || typeof value === "function") && typeof (then = value.then) === "function") {
-                if (value === self)
-                  throw new TypeError("Promise can't be resolved with itself.");
-                executeOnce(then.bind(value));
-              } else {
-                callAsync(function() {
-                  if (!shouldAbsorb && list.length === 0)
-                    console.error("Possible unhandled promise rejection:", value);
-                  for (var i = 0; i < list.length; i++)
-                    list[i](value);
-                  resolvers.length = 0, rejectors.length = 0;
-                  instance.state = shouldAbsorb;
-                  instance.retry = function() {
-                    execute(value);
-                  };
-                });
-              }
-            } catch (e) {
-              rejectCurrent(e);
-            }
-          };
-        }
-        function executeOnce(then) {
-          var runs = 0;
-          function run(fn) {
-            return function(value) {
-              if (runs++ > 0)
-                return;
-              fn(value);
-            };
+      var delayedRemoval = /* @__PURE__ */ new WeakMap();
+      function* domFor(vnode) {
+        var dom = vnode.dom;
+        var domSize = vnode.domSize;
+        var generation = delayedRemoval.get(dom);
+        if (dom != null) do {
+          var nextSibling = dom.nextSibling;
+          if (delayedRemoval.get(dom) === generation) {
+            yield dom;
+            domSize--;
           }
-          var onerror = run(rejectCurrent);
-          try {
-            then(run(resolveCurrent), onerror);
-          } catch (e) {
-            onerror(e);
-          }
-        }
-        executeOnce(executor);
-      };
-      PromisePolyfill.prototype.then = function(onFulfilled, onRejection) {
-        var self = this, instance = self._instance;
-        function handle(callback, list, next, state2) {
-          list.push(function(value) {
-            if (typeof callback !== "function")
-              next(value);
-            else
-              try {
-                resolveNext(callback(value));
-              } catch (e) {
-                if (rejectNext)
-                  rejectNext(e);
-              }
-          });
-          if (typeof instance.retry === "function" && state2 === instance.state)
-            instance.retry();
-        }
-        var resolveNext, rejectNext;
-        var promise = new PromisePolyfill(function(resolve, reject) {
-          resolveNext = resolve, rejectNext = reject;
-        });
-        handle(onFulfilled, instance.resolvers, resolveNext, true), handle(onRejection, instance.rejectors, rejectNext, false);
-        return promise;
-      };
-      PromisePolyfill.prototype.catch = function(onRejection) {
-        return this.then(null, onRejection);
-      };
-      PromisePolyfill.prototype.finally = function(callback) {
-        return this.then(
-          function(value) {
-            return PromisePolyfill.resolve(callback()).then(function() {
-              return value;
-            });
-          },
-          function(reason) {
-            return PromisePolyfill.resolve(callback()).then(function() {
-              return PromisePolyfill.reject(reason);
-            });
-          }
-        );
-      };
-      PromisePolyfill.resolve = function(value) {
-        if (value instanceof PromisePolyfill)
-          return value;
-        return new PromisePolyfill(function(resolve) {
-          resolve(value);
-        });
-      };
-      PromisePolyfill.reject = function(value) {
-        return new PromisePolyfill(function(resolve, reject) {
-          reject(value);
-        });
-      };
-      PromisePolyfill.all = function(list) {
-        return new PromisePolyfill(function(resolve, reject) {
-          var total = list.length, count = 0, values = [];
-          if (list.length === 0)
-            resolve([]);
-          else
-            for (var i = 0; i < list.length; i++) {
-              (function(i2) {
-                function consume(value) {
-                  count++;
-                  values[i2] = value;
-                  if (count === total)
-                    resolve(values);
-                }
-                if (list[i2] != null && (typeof list[i2] === "object" || typeof list[i2] === "function") && typeof list[i2].then === "function") {
-                  list[i2].then(consume, reject);
-                } else
-                  consume(list[i2]);
-              })(i);
-            }
-        });
-      };
-      PromisePolyfill.race = function(list) {
-        return new PromisePolyfill(function(resolve, reject) {
-          for (var i = 0; i < list.length; i++) {
-            list[i].then(resolve, reject);
-          }
-        });
-      };
-      module.exports = PromisePolyfill;
-    }
-  });
-
-  // node_modules/mithril/promise/promise.js
-  var require_promise = __commonJS({
-    "node_modules/mithril/promise/promise.js"(exports, module) {
-      "use strict";
-      var PromisePolyfill = require_polyfill();
-      if (typeof window !== "undefined") {
-        if (typeof window.Promise === "undefined") {
-          window.Promise = PromisePolyfill;
-        } else if (!window.Promise.prototype.finally) {
-          window.Promise.prototype.finally = PromisePolyfill.prototype.finally;
-        }
-        module.exports = window.Promise;
-      } else if (typeof global !== "undefined") {
-        if (typeof global.Promise === "undefined") {
-          global.Promise = PromisePolyfill;
-        } else if (!global.Promise.prototype.finally) {
-          global.Promise.prototype.finally = PromisePolyfill.prototype.finally;
-        }
-        module.exports = global.Promise;
-      } else {
-        module.exports = PromisePolyfill;
+          dom = nextSibling;
+        } while (domSize);
       }
+      module.exports = {
+        delayedRemoval,
+        domFor
+      };
     }
   });
 
@@ -395,19 +226,24 @@
     "node_modules/mithril/render/render.js"(exports, module) {
       "use strict";
       var Vnode = require_vnode();
-      module.exports = function($window) {
-        var $doc = $window && $window.document;
-        var currentRedraw;
+      var df = require_domFor();
+      var delayedRemoval = df.delayedRemoval;
+      var domFor = df.domFor;
+      module.exports = function() {
         var nameSpace = {
           svg: "http://www.w3.org/2000/svg",
           math: "http://www.w3.org/1998/Math/MathML"
         };
+        var currentRedraw;
+        var currentRender;
+        function getDocument(dom) {
+          return dom.ownerDocument;
+        }
         function getNameSpace(vnode) {
           return vnode.attrs && vnode.attrs.xmlns || nameSpace[vnode.tag];
         }
         function checkState(vnode, original) {
-          if (vnode.state !== original)
-            throw new Error("'vnode.state' must not be modified.");
+          if (vnode.state !== original) throw new Error("'vnode.state' must not be modified.");
         }
         function callHook(vnode) {
           var original = vnode.state;
@@ -417,9 +253,9 @@
             checkState(vnode, original);
           }
         }
-        function activeElement() {
+        function activeElement(dom) {
           try {
-            return $doc.activeElement;
+            return getDocument(dom).activeElement;
           } catch (e) {
             return null;
           }
@@ -436,8 +272,7 @@
           var tag = vnode.tag;
           if (typeof tag === "string") {
             vnode.state = {};
-            if (vnode.attrs != null)
-              initLifecycle(vnode.attrs, vnode, hooks);
+            if (vnode.attrs != null) initLifecycle(vnode.attrs, vnode, hooks);
             switch (tag) {
               case "#":
                 createText(parent, vnode, nextSibling);
@@ -451,17 +286,16 @@
               default:
                 createElement(parent, vnode, hooks, ns, nextSibling);
             }
-          } else
-            createComponent(parent, vnode, hooks, ns, nextSibling);
+          } else createComponent(parent, vnode, hooks, ns, nextSibling);
         }
         function createText(parent, vnode, nextSibling) {
-          vnode.dom = $doc.createTextNode(vnode.children);
-          insertNode(parent, vnode.dom, nextSibling);
+          vnode.dom = getDocument(parent).createTextNode(vnode.children);
+          insertDOM(parent, vnode.dom, nextSibling);
         }
         var possibleParents = { caption: "table", thead: "table", tbody: "table", tfoot: "table", tr: "tbody", th: "tr", td: "tr", colgroup: "table", col: "colgroup" };
         function createHTML(parent, vnode, ns, nextSibling) {
           var match = vnode.children.match(/^\s*?<(\w+)/im) || [];
-          var temp = $doc.createElement(possibleParents[match[1]] || "div");
+          var temp = getDocument(parent).createElement(possibleParents[match[1]] || "div");
           if (ns === "http://www.w3.org/2000/svg") {
             temp.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg">' + vnode.children + "</svg>";
             temp = temp.firstChild;
@@ -470,42 +304,39 @@
           }
           vnode.dom = temp.firstChild;
           vnode.domSize = temp.childNodes.length;
-          vnode.instance = [];
-          var fragment = $doc.createDocumentFragment();
+          var fragment = getDocument(parent).createDocumentFragment();
           var child;
           while (child = temp.firstChild) {
-            vnode.instance.push(child);
             fragment.appendChild(child);
           }
-          insertNode(parent, fragment, nextSibling);
+          insertDOM(parent, fragment, nextSibling);
         }
         function createFragment(parent, vnode, hooks, ns, nextSibling) {
-          var fragment = $doc.createDocumentFragment();
+          var fragment = getDocument(parent).createDocumentFragment();
           if (vnode.children != null) {
             var children = vnode.children;
             createNodes(fragment, children, 0, children.length, hooks, null, ns);
           }
           vnode.dom = fragment.firstChild;
           vnode.domSize = fragment.childNodes.length;
-          insertNode(parent, fragment, nextSibling);
+          insertDOM(parent, fragment, nextSibling);
         }
         function createElement(parent, vnode, hooks, ns, nextSibling) {
           var tag = vnode.tag;
           var attrs = vnode.attrs;
-          var is = attrs && attrs.is;
+          var is = vnode.is;
           ns = getNameSpace(vnode) || ns;
-          var element = ns ? is ? $doc.createElementNS(ns, tag, { is }) : $doc.createElementNS(ns, tag) : is ? $doc.createElement(tag, { is }) : $doc.createElement(tag);
+          var element = ns ? is ? getDocument(parent).createElementNS(ns, tag, { is }) : getDocument(parent).createElementNS(ns, tag) : is ? getDocument(parent).createElement(tag, { is }) : getDocument(parent).createElement(tag);
           vnode.dom = element;
           if (attrs != null) {
             setAttrs(vnode, attrs, ns);
           }
-          insertNode(parent, element, nextSibling);
+          insertDOM(parent, element, nextSibling);
           if (!maybeSetContentEditable(vnode)) {
             if (vnode.children != null) {
               var children = vnode.children;
               createNodes(element, children, 0, children.length, hooks, null, ns);
-              if (vnode.tag === "select" && attrs != null)
-                setLateSelectAttrs(vnode, attrs);
+              if (vnode.tag === "select" && attrs != null) setLateSelectAttrs(vnode, attrs);
             }
           }
         }
@@ -514,23 +345,19 @@
           if (typeof vnode.tag.view === "function") {
             vnode.state = Object.create(vnode.tag);
             sentinel = vnode.state.view;
-            if (sentinel.$$reentrantLock$$ != null)
-              return;
+            if (sentinel.$$reentrantLock$$ != null) return;
             sentinel.$$reentrantLock$$ = true;
           } else {
             vnode.state = void 0;
             sentinel = vnode.tag;
-            if (sentinel.$$reentrantLock$$ != null)
-              return;
+            if (sentinel.$$reentrantLock$$ != null) return;
             sentinel.$$reentrantLock$$ = true;
             vnode.state = vnode.tag.prototype != null && typeof vnode.tag.prototype.view === "function" ? new vnode.tag(vnode) : vnode.tag(vnode);
           }
           initLifecycle(vnode.state, vnode, hooks);
-          if (vnode.attrs != null)
-            initLifecycle(vnode.attrs, vnode, hooks);
+          if (vnode.attrs != null) initLifecycle(vnode.attrs, vnode, hooks);
           vnode.instance = Vnode.normalize(callHook.call(vnode.state.view, vnode));
-          if (vnode.instance === vnode)
-            throw Error("A view cannot return the vnode it received as argument");
+          if (vnode.instance === vnode) throw Error("A view cannot return the vnode it received as argument");
           sentinel.$$reentrantLock$$ = null;
         }
         function createComponent(parent, vnode, hooks, ns, nextSibling) {
@@ -544,22 +371,15 @@
           }
         }
         function updateNodes(parent, old, vnodes, hooks, nextSibling, ns) {
-          if (old === vnodes || old == null && vnodes == null)
-            return;
-          else if (old == null || old.length === 0)
-            createNodes(parent, vnodes, 0, vnodes.length, hooks, nextSibling, ns);
-          else if (vnodes == null || vnodes.length === 0)
-            removeNodes(parent, old, 0, old.length);
+          if (old === vnodes || old == null && vnodes == null) return;
+          else if (old == null || old.length === 0) createNodes(parent, vnodes, 0, vnodes.length, hooks, nextSibling, ns);
+          else if (vnodes == null || vnodes.length === 0) removeNodes(parent, old, 0, old.length);
           else {
             var isOldKeyed = old[0] != null && old[0].key != null;
             var isKeyed = vnodes[0] != null && vnodes[0].key != null;
             var start = 0, oldStart = 0;
-            if (!isOldKeyed)
-              while (oldStart < old.length && old[oldStart] == null)
-                oldStart++;
-            if (!isKeyed)
-              while (start < vnodes.length && vnodes[start] == null)
-                start++;
+            if (!isOldKeyed) while (oldStart < old.length && old[oldStart] == null) oldStart++;
+            if (!isKeyed) while (start < vnodes.length && vnodes[start] == null) start++;
             if (isOldKeyed !== isKeyed) {
               removeNodes(parent, old, oldStart, old.length);
               createNodes(parent, vnodes, start, vnodes.length, hooks, nextSibling, ns);
@@ -569,56 +389,39 @@
               for (; start < commonLength; start++) {
                 o = old[start];
                 v = vnodes[start];
-                if (o === v || o == null && v == null)
-                  continue;
-                else if (o == null)
-                  createNode(parent, v, hooks, ns, getNextSibling(old, start + 1, nextSibling));
-                else if (v == null)
-                  removeNode(parent, o);
-                else
-                  updateNode(parent, o, v, hooks, getNextSibling(old, start + 1, nextSibling), ns);
+                if (o === v || o == null && v == null) continue;
+                else if (o == null) createNode(parent, v, hooks, ns, getNextSibling(old, start + 1, nextSibling));
+                else if (v == null) removeNode(parent, o);
+                else updateNode(parent, o, v, hooks, getNextSibling(old, start + 1, nextSibling), ns);
               }
-              if (old.length > commonLength)
-                removeNodes(parent, old, start, old.length);
-              if (vnodes.length > commonLength)
-                createNodes(parent, vnodes, start, vnodes.length, hooks, nextSibling, ns);
+              if (old.length > commonLength) removeNodes(parent, old, start, old.length);
+              if (vnodes.length > commonLength) createNodes(parent, vnodes, start, vnodes.length, hooks, nextSibling, ns);
             } else {
               var oldEnd = old.length - 1, end = vnodes.length - 1, map, o, v, oe, ve, topSibling;
               while (oldEnd >= oldStart && end >= start) {
                 oe = old[oldEnd];
                 ve = vnodes[end];
-                if (oe.key !== ve.key)
-                  break;
-                if (oe !== ve)
-                  updateNode(parent, oe, ve, hooks, nextSibling, ns);
-                if (ve.dom != null)
-                  nextSibling = ve.dom;
+                if (oe.key !== ve.key) break;
+                if (oe !== ve) updateNode(parent, oe, ve, hooks, nextSibling, ns);
+                if (ve.dom != null) nextSibling = ve.dom;
                 oldEnd--, end--;
               }
               while (oldEnd >= oldStart && end >= start) {
                 o = old[oldStart];
                 v = vnodes[start];
-                if (o.key !== v.key)
-                  break;
+                if (o.key !== v.key) break;
                 oldStart++, start++;
-                if (o !== v)
-                  updateNode(parent, o, v, hooks, getNextSibling(old, oldStart, nextSibling), ns);
+                if (o !== v) updateNode(parent, o, v, hooks, getNextSibling(old, oldStart, nextSibling), ns);
               }
               while (oldEnd >= oldStart && end >= start) {
-                if (start === end)
-                  break;
-                if (o.key !== ve.key || oe.key !== v.key)
-                  break;
+                if (start === end) break;
+                if (o.key !== ve.key || oe.key !== v.key) break;
                 topSibling = getNextSibling(old, oldStart, nextSibling);
-                moveNodes(parent, oe, topSibling);
-                if (oe !== v)
-                  updateNode(parent, oe, v, hooks, topSibling, ns);
-                if (++start <= --end)
-                  moveNodes(parent, o, nextSibling);
-                if (o !== ve)
-                  updateNode(parent, o, ve, hooks, nextSibling, ns);
-                if (ve.dom != null)
-                  nextSibling = ve.dom;
+                moveDOM(parent, oe, topSibling);
+                if (oe !== v) updateNode(parent, oe, v, hooks, topSibling, ns);
+                if (++start <= --end) moveDOM(parent, o, nextSibling);
+                if (o !== ve) updateNode(parent, o, ve, hooks, nextSibling, ns);
+                if (ve.dom != null) nextSibling = ve.dom;
                 oldStart++;
                 oldEnd--;
                 oe = old[oldEnd];
@@ -627,27 +430,20 @@
                 v = vnodes[start];
               }
               while (oldEnd >= oldStart && end >= start) {
-                if (oe.key !== ve.key)
-                  break;
-                if (oe !== ve)
-                  updateNode(parent, oe, ve, hooks, nextSibling, ns);
-                if (ve.dom != null)
-                  nextSibling = ve.dom;
+                if (oe.key !== ve.key) break;
+                if (oe !== ve) updateNode(parent, oe, ve, hooks, nextSibling, ns);
+                if (ve.dom != null) nextSibling = ve.dom;
                 oldEnd--, end--;
                 oe = old[oldEnd];
                 ve = vnodes[end];
               }
-              if (start > end)
-                removeNodes(parent, old, oldStart, oldEnd + 1);
-              else if (oldStart > oldEnd)
-                createNodes(parent, vnodes, start, end + 1, hooks, nextSibling, ns);
+              if (start > end) removeNodes(parent, old, oldStart, oldEnd + 1);
+              else if (oldStart > oldEnd) createNodes(parent, vnodes, start, end + 1, hooks, nextSibling, ns);
               else {
                 var originalNextSibling = nextSibling, vnodesLength = end - start + 1, oldIndices = new Array(vnodesLength), li = 0, i = 0, pos = 2147483647, matched = 0, map, lisIndices;
-                for (i = 0; i < vnodesLength; i++)
-                  oldIndices[i] = -1;
+                for (i = 0; i < vnodesLength; i++) oldIndices[i] = -1;
                 for (i = end; i >= start; i--) {
-                  if (map == null)
-                    map = getKeyMap(old, oldStart, oldEnd + 1);
+                  if (map == null) map = getKeyMap(old, oldStart, oldEnd + 1);
                   ve = vnodes[i];
                   var oldIndex = map[ve.key];
                   if (oldIndex != null) {
@@ -655,42 +451,32 @@
                     oldIndices[i - start] = oldIndex;
                     oe = old[oldIndex];
                     old[oldIndex] = null;
-                    if (oe !== ve)
-                      updateNode(parent, oe, ve, hooks, nextSibling, ns);
-                    if (ve.dom != null)
-                      nextSibling = ve.dom;
+                    if (oe !== ve) updateNode(parent, oe, ve, hooks, nextSibling, ns);
+                    if (ve.dom != null) nextSibling = ve.dom;
                     matched++;
                   }
                 }
                 nextSibling = originalNextSibling;
-                if (matched !== oldEnd - oldStart + 1)
-                  removeNodes(parent, old, oldStart, oldEnd + 1);
-                if (matched === 0)
-                  createNodes(parent, vnodes, start, end + 1, hooks, nextSibling, ns);
+                if (matched !== oldEnd - oldStart + 1) removeNodes(parent, old, oldStart, oldEnd + 1);
+                if (matched === 0) createNodes(parent, vnodes, start, end + 1, hooks, nextSibling, ns);
                 else {
                   if (pos === -1) {
                     lisIndices = makeLisIndices(oldIndices);
                     li = lisIndices.length - 1;
                     for (i = end; i >= start; i--) {
                       v = vnodes[i];
-                      if (oldIndices[i - start] === -1)
-                        createNode(parent, v, hooks, ns, nextSibling);
+                      if (oldIndices[i - start] === -1) createNode(parent, v, hooks, ns, nextSibling);
                       else {
-                        if (lisIndices[li] === i - start)
-                          li--;
-                        else
-                          moveNodes(parent, v, nextSibling);
+                        if (lisIndices[li] === i - start) li--;
+                        else moveDOM(parent, v, nextSibling);
                       }
-                      if (v.dom != null)
-                        nextSibling = vnodes[i].dom;
+                      if (v.dom != null) nextSibling = vnodes[i].dom;
                     }
                   } else {
                     for (i = end; i >= start; i--) {
                       v = vnodes[i];
-                      if (oldIndices[i - start] === -1)
-                        createNode(parent, v, hooks, ns, nextSibling);
-                      if (v.dom != null)
-                        nextSibling = vnodes[i].dom;
+                      if (oldIndices[i - start] === -1) createNode(parent, v, hooks, ns, nextSibling);
+                      if (v.dom != null) nextSibling = vnodes[i].dom;
                     }
                   }
                 }
@@ -700,11 +486,10 @@
         }
         function updateNode(parent, old, vnode, hooks, nextSibling, ns) {
           var oldTag = old.tag, tag = vnode.tag;
-          if (oldTag === tag) {
+          if (oldTag === tag && old.is === vnode.is) {
             vnode.state = old.state;
             vnode.events = old.events;
-            if (shouldNotUpdate(vnode, old))
-              return;
+            if (shouldNotUpdate(vnode, old)) return;
             if (typeof oldTag === "string") {
               if (vnode.attrs != null) {
                 updateLifecycle(vnode.attrs, vnode, hooks);
@@ -722,8 +507,7 @@
                 default:
                   updateElement(old, vnode, hooks, ns);
               }
-            } else
-              updateComponent(parent, old, vnode, hooks, nextSibling, ns);
+            } else updateComponent(parent, old, vnode, hooks, nextSibling, ns);
           } else {
             removeNode(parent, old);
             createNode(parent, vnode, hooks, ns, nextSibling);
@@ -737,12 +521,11 @@
         }
         function updateHTML(parent, old, vnode, ns, nextSibling) {
           if (old.children !== vnode.children) {
-            removeHTML(parent, old);
+            removeDOM(parent, old);
             createHTML(parent, vnode, ns, nextSibling);
           } else {
             vnode.dom = old.dom;
             vnode.domSize = old.domSize;
-            vnode.instance = old.instance;
           }
         }
         function updateFragment(parent, old, vnode, hooks, nextSibling, ns) {
@@ -753,22 +536,16 @@
             for (var i = 0; i < children.length; i++) {
               var child = children[i];
               if (child != null && child.dom != null) {
-                if (vnode.dom == null)
-                  vnode.dom = child.dom;
+                if (vnode.dom == null) vnode.dom = child.dom;
                 domSize += child.domSize || 1;
               }
             }
-            if (domSize !== 1)
-              vnode.domSize = domSize;
+            if (domSize !== 1) vnode.domSize = domSize;
           }
         }
         function updateElement(old, vnode, hooks, ns) {
           var element = vnode.dom = old.dom;
           ns = getNameSpace(vnode) || ns;
-          if (vnode.tag === "textarea") {
-            if (vnode.attrs == null)
-              vnode.attrs = {};
-          }
           updateAttrs(vnode, old.attrs, vnode.attrs, ns);
           if (!maybeSetContentEditable(vnode)) {
             updateNodes(element, old.children, vnode.children, hooks, null, ns);
@@ -776,16 +553,12 @@
         }
         function updateComponent(parent, old, vnode, hooks, nextSibling, ns) {
           vnode.instance = Vnode.normalize(callHook.call(vnode.state.view, vnode));
-          if (vnode.instance === vnode)
-            throw Error("A view cannot return the vnode it received as argument");
+          if (vnode.instance === vnode) throw Error("A view cannot return the vnode it received as argument");
           updateLifecycle(vnode.state, vnode, hooks);
-          if (vnode.attrs != null)
-            updateLifecycle(vnode.attrs, vnode, hooks);
+          if (vnode.attrs != null) updateLifecycle(vnode.attrs, vnode, hooks);
           if (vnode.instance != null) {
-            if (old.instance == null)
-              createNode(parent, vnode.instance, hooks, ns, nextSibling);
-            else
-              updateNode(parent, old.instance, vnode.instance, hooks, nextSibling, ns);
+            if (old.instance == null) createNode(parent, vnode.instance, hooks, ns, nextSibling);
+            else updateNode(parent, old.instance, vnode.instance, hooks, nextSibling, ns);
             vnode.dom = vnode.instance.dom;
             vnode.domSize = vnode.instance.domSize;
           } else if (old.instance != null) {
@@ -803,8 +576,7 @@
             var vnode = vnodes[start];
             if (vnode != null) {
               var key = vnode.key;
-              if (key != null)
-                map[key] = start;
+              if (key != null) map[key] = start;
             }
           }
           return map;
@@ -814,11 +586,9 @@
           var result = [0];
           var u = 0, v = 0, i = 0;
           var il = lisTemp.length = a.length;
-          for (var i = 0; i < il; i++)
-            lisTemp[i] = a[i];
+          for (var i = 0; i < il; i++) lisTemp[i] = a[i];
           for (var i = 0; i < il; ++i) {
-            if (a[i] === -1)
-              continue;
+            if (a[i] === -1) continue;
             var j = result[result.length - 1];
             if (a[j] < a[i]) {
               lisTemp[i] = j;
@@ -836,8 +606,7 @@
               }
             }
             if (a[i] < a[result[u]]) {
-              if (u > 0)
-                lisTemp[i] = result[u - 1];
+              if (u > 0) lisTemp[i] = result[u - 1];
               result[u] = i;
             }
           }
@@ -852,234 +621,135 @@
         }
         function getNextSibling(vnodes, i, nextSibling) {
           for (; i < vnodes.length; i++) {
-            if (vnodes[i] != null && vnodes[i].dom != null)
-              return vnodes[i].dom;
+            if (vnodes[i] != null && vnodes[i].dom != null) return vnodes[i].dom;
           }
           return nextSibling;
         }
-        function moveNodes(parent, vnode, nextSibling) {
-          var frag = $doc.createDocumentFragment();
-          moveChildToFrag(parent, frag, vnode);
-          insertNode(parent, frag, nextSibling);
-        }
-        function moveChildToFrag(parent, frag, vnode) {
-          while (vnode.dom != null && vnode.dom.parentNode === parent) {
-            if (typeof vnode.tag !== "string") {
-              vnode = vnode.instance;
-              if (vnode != null)
-                continue;
-            } else if (vnode.tag === "<") {
-              for (var i = 0; i < vnode.instance.length; i++) {
-                frag.appendChild(vnode.instance[i]);
-              }
-            } else if (vnode.tag !== "[") {
-              frag.appendChild(vnode.dom);
-            } else if (vnode.children.length === 1) {
-              vnode = vnode.children[0];
-              if (vnode != null)
-                continue;
+        function moveDOM(parent, vnode, nextSibling) {
+          if (vnode.dom != null) {
+            var target;
+            if (vnode.domSize == null) {
+              target = vnode.dom;
             } else {
-              for (var i = 0; i < vnode.children.length; i++) {
-                var child = vnode.children[i];
-                if (child != null)
-                  moveChildToFrag(parent, frag, child);
-              }
+              target = getDocument(parent).createDocumentFragment();
+              for (var dom of domFor(vnode)) target.appendChild(dom);
             }
-            break;
+            insertDOM(parent, target, nextSibling);
           }
         }
-        function insertNode(parent, dom, nextSibling) {
-          if (nextSibling != null)
-            parent.insertBefore(dom, nextSibling);
-          else
-            parent.appendChild(dom);
+        function insertDOM(parent, dom, nextSibling) {
+          if (nextSibling != null) parent.insertBefore(dom, nextSibling);
+          else parent.appendChild(dom);
         }
         function maybeSetContentEditable(vnode) {
           if (vnode.attrs == null || vnode.attrs.contenteditable == null && // attribute
-          vnode.attrs.contentEditable == null)
-            return false;
+          vnode.attrs.contentEditable == null) return false;
           var children = vnode.children;
           if (children != null && children.length === 1 && children[0].tag === "<") {
             var content = children[0].children;
-            if (vnode.dom.innerHTML !== content)
-              vnode.dom.innerHTML = content;
-          } else if (children != null && children.length !== 0)
-            throw new Error("Child node of a contenteditable must be trusted.");
+            if (vnode.dom.innerHTML !== content) vnode.dom.innerHTML = content;
+          } else if (children != null && children.length !== 0) throw new Error("Child node of a contenteditable must be trusted.");
           return true;
         }
         function removeNodes(parent, vnodes, start, end) {
           for (var i = start; i < end; i++) {
             var vnode = vnodes[i];
-            if (vnode != null)
-              removeNode(parent, vnode);
+            if (vnode != null) removeNode(parent, vnode);
+          }
+        }
+        function tryBlockRemove(parent, vnode, source, counter) {
+          var original = vnode.state;
+          var result = callHook.call(source.onbeforeremove, vnode);
+          if (result == null) return;
+          var generation = currentRender;
+          for (var dom of domFor(vnode)) delayedRemoval.set(dom, generation);
+          counter.v++;
+          Promise.resolve(result).finally(function() {
+            checkState(vnode, original);
+            tryResumeRemove(parent, vnode, counter);
+          });
+        }
+        function tryResumeRemove(parent, vnode, counter) {
+          if (--counter.v === 0) {
+            onremove(vnode);
+            removeDOM(parent, vnode);
           }
         }
         function removeNode(parent, vnode) {
-          var mask = 0;
-          var original = vnode.state;
-          var stateResult, attrsResult;
-          if (typeof vnode.tag !== "string" && typeof vnode.state.onbeforeremove === "function") {
-            var result = callHook.call(vnode.state.onbeforeremove, vnode);
-            if (result != null && typeof result.then === "function") {
-              mask = 1;
-              stateResult = result;
-            }
-          }
-          if (vnode.attrs && typeof vnode.attrs.onbeforeremove === "function") {
-            var result = callHook.call(vnode.attrs.onbeforeremove, vnode);
-            if (result != null && typeof result.then === "function") {
-              mask |= 2;
-              attrsResult = result;
-            }
-          }
-          checkState(vnode, original);
-          if (!mask) {
-            onremove(vnode);
-            removeChild(parent, vnode);
+          var counter = { v: 1 };
+          if (typeof vnode.tag !== "string" && typeof vnode.state.onbeforeremove === "function") tryBlockRemove(parent, vnode, vnode.state, counter);
+          if (vnode.attrs && typeof vnode.attrs.onbeforeremove === "function") tryBlockRemove(parent, vnode, vnode.attrs, counter);
+          tryResumeRemove(parent, vnode, counter);
+        }
+        function removeDOM(parent, vnode) {
+          if (vnode.dom == null) return;
+          if (vnode.domSize == null) {
+            parent.removeChild(vnode.dom);
           } else {
-            if (stateResult != null) {
-              var next = function() {
-                if (mask & 1) {
-                  mask &= 2;
-                  if (!mask)
-                    reallyRemove();
-                }
-              };
-              stateResult.then(next, next);
-            }
-            if (attrsResult != null) {
-              var next = function() {
-                if (mask & 2) {
-                  mask &= 1;
-                  if (!mask)
-                    reallyRemove();
-                }
-              };
-              attrsResult.then(next, next);
-            }
-          }
-          function reallyRemove() {
-            checkState(vnode, original);
-            onremove(vnode);
-            removeChild(parent, vnode);
-          }
-        }
-        function removeHTML(parent, vnode) {
-          for (var i = 0; i < vnode.instance.length; i++) {
-            parent.removeChild(vnode.instance[i]);
-          }
-        }
-        function removeChild(parent, vnode) {
-          while (vnode.dom != null && vnode.dom.parentNode === parent) {
-            if (typeof vnode.tag !== "string") {
-              vnode = vnode.instance;
-              if (vnode != null)
-                continue;
-            } else if (vnode.tag === "<") {
-              removeHTML(parent, vnode);
-            } else {
-              if (vnode.tag !== "[") {
-                parent.removeChild(vnode.dom);
-                if (!Array.isArray(vnode.children))
-                  break;
-              }
-              if (vnode.children.length === 1) {
-                vnode = vnode.children[0];
-                if (vnode != null)
-                  continue;
-              } else {
-                for (var i = 0; i < vnode.children.length; i++) {
-                  var child = vnode.children[i];
-                  if (child != null)
-                    removeChild(parent, child);
-                }
-              }
-            }
-            break;
+            for (var dom of domFor(vnode)) parent.removeChild(dom);
           }
         }
         function onremove(vnode) {
-          if (typeof vnode.tag !== "string" && typeof vnode.state.onremove === "function")
-            callHook.call(vnode.state.onremove, vnode);
-          if (vnode.attrs && typeof vnode.attrs.onremove === "function")
-            callHook.call(vnode.attrs.onremove, vnode);
+          if (typeof vnode.tag !== "string" && typeof vnode.state.onremove === "function") callHook.call(vnode.state.onremove, vnode);
+          if (vnode.attrs && typeof vnode.attrs.onremove === "function") callHook.call(vnode.attrs.onremove, vnode);
           if (typeof vnode.tag !== "string") {
-            if (vnode.instance != null)
-              onremove(vnode.instance);
+            if (vnode.instance != null) onremove(vnode.instance);
           } else {
+            if (vnode.events != null) vnode.events._ = null;
             var children = vnode.children;
             if (Array.isArray(children)) {
               for (var i = 0; i < children.length; i++) {
                 var child = children[i];
-                if (child != null)
-                  onremove(child);
+                if (child != null) onremove(child);
               }
             }
           }
         }
         function setAttrs(vnode, attrs, ns) {
-          if (vnode.tag === "input" && attrs.type != null)
-            vnode.dom.setAttribute("type", attrs.type);
-          var isFileInput = attrs != null && vnode.tag === "input" && attrs.type === "file";
           for (var key in attrs) {
-            setAttr(vnode, key, null, attrs[key], ns, isFileInput);
+            setAttr(vnode, key, null, attrs[key], ns);
           }
         }
-        function setAttr(vnode, key, old, value, ns, isFileInput) {
-          if (key === "key" || key === "is" || value == null || isLifecycleMethod(key) || old === value && !isFormAttribute(vnode, key) && typeof value !== "object" || key === "type" && vnode.tag === "input")
-            return;
-          if (key[0] === "o" && key[1] === "n")
-            return updateEvent(vnode, key, value);
-          if (key.slice(0, 6) === "xlink:")
-            vnode.dom.setAttributeNS("http://www.w3.org/1999/xlink", key.slice(6), value);
-          else if (key === "style")
-            updateStyle(vnode.dom, old, value);
+        function setAttr(vnode, key, old, value, ns) {
+          if (key === "key" || value == null || isLifecycleMethod(key) || old === value && !isFormAttribute(vnode, key) && typeof value !== "object") return;
+          if (key[0] === "o" && key[1] === "n") return updateEvent(vnode, key, value);
+          if (key.slice(0, 6) === "xlink:") vnode.dom.setAttributeNS("http://www.w3.org/1999/xlink", key.slice(6), value);
+          else if (key === "style") updateStyle(vnode.dom, old, value);
           else if (hasPropertyKey(vnode, key, ns)) {
             if (key === "value") {
-              if ((vnode.tag === "input" || vnode.tag === "textarea") && vnode.dom.value === "" + value && (isFileInput || vnode.dom === activeElement()))
-                return;
-              if (vnode.tag === "select" && old !== null && vnode.dom.value === "" + value)
-                return;
-              if (vnode.tag === "option" && old !== null && vnode.dom.value === "" + value)
-                return;
-              if (isFileInput && "" + value !== "") {
+              if ((vnode.tag === "input" || vnode.tag === "textarea") && vnode.dom.value === "" + value) return;
+              if (vnode.tag === "select" && old !== null && vnode.dom.value === "" + value) return;
+              if (vnode.tag === "option" && old !== null && vnode.dom.value === "" + value) return;
+              if (vnode.tag === "input" && vnode.attrs.type === "file" && "" + value !== "") {
                 console.error("`value` is read-only on file inputs!");
                 return;
               }
             }
-            vnode.dom[key] = value;
+            if (vnode.tag === "input" && key === "type") vnode.dom.setAttribute(key, value);
+            else vnode.dom[key] = value;
           } else {
             if (typeof value === "boolean") {
-              if (value)
-                vnode.dom.setAttribute(key, "");
-              else
-                vnode.dom.removeAttribute(key);
-            } else
-              vnode.dom.setAttribute(key === "className" ? "class" : key, value);
+              if (value) vnode.dom.setAttribute(key, "");
+              else vnode.dom.removeAttribute(key);
+            } else vnode.dom.setAttribute(key === "className" ? "class" : key, value);
           }
         }
         function removeAttr(vnode, key, old, ns) {
-          if (key === "key" || key === "is" || old == null || isLifecycleMethod(key))
-            return;
-          if (key[0] === "o" && key[1] === "n")
-            updateEvent(vnode, key, void 0);
-          else if (key === "style")
-            updateStyle(vnode.dom, old, null);
-          else if (hasPropertyKey(vnode, key, ns) && key !== "className" && key !== "title" && !(key === "value" && (vnode.tag === "option" || vnode.tag === "select" && vnode.dom.selectedIndex === -1 && vnode.dom === activeElement())) && !(vnode.tag === "input" && key === "type")) {
+          if (key === "key" || old == null || isLifecycleMethod(key)) return;
+          if (key[0] === "o" && key[1] === "n") updateEvent(vnode, key, void 0);
+          else if (key === "style") updateStyle(vnode.dom, old, null);
+          else if (hasPropertyKey(vnode, key, ns) && key !== "className" && key !== "title" && !(key === "value" && (vnode.tag === "option" || vnode.tag === "select" && vnode.dom.selectedIndex === -1 && vnode.dom === activeElement(vnode.dom))) && !(vnode.tag === "input" && key === "type")) {
             vnode.dom[key] = null;
           } else {
             var nsLastIndex = key.indexOf(":");
-            if (nsLastIndex !== -1)
-              key = key.slice(nsLastIndex + 1);
-            if (old !== false)
-              vnode.dom.removeAttribute(key === "className" ? "class" : key);
+            if (nsLastIndex !== -1) key = key.slice(nsLastIndex + 1);
+            if (old !== false) vnode.dom.removeAttribute(key === "className" ? "class" : key);
           }
         }
         function setLateSelectAttrs(vnode, attrs) {
           if ("value" in attrs) {
             if (attrs.value === null) {
-              if (vnode.dom.selectedIndex !== -1)
-                vnode.dom.value = null;
+              if (vnode.dom.selectedIndex !== -1) vnode.dom.value = null;
             } else {
               var normalized = "" + attrs.value;
               if (vnode.dom.value !== normalized || vnode.dom.selectedIndex === -1) {
@@ -1087,71 +757,64 @@
               }
             }
           }
-          if ("selectedIndex" in attrs)
-            setAttr(vnode, "selectedIndex", null, attrs.selectedIndex, void 0);
+          if ("selectedIndex" in attrs) setAttr(vnode, "selectedIndex", null, attrs.selectedIndex, void 0);
         }
         function updateAttrs(vnode, old, attrs, ns) {
-          if (old && old === attrs) {
-            console.warn("Don't reuse attrs object, use new object for every redraw, this will throw in next major");
-          }
-          if (attrs != null) {
-            if (vnode.tag === "input" && attrs.type != null)
-              vnode.dom.setAttribute("type", attrs.type);
-            var isFileInput = vnode.tag === "input" && attrs.type === "file";
-            for (var key in attrs) {
-              setAttr(vnode, key, old && old[key], attrs[key], ns, isFileInput);
-            }
-          }
           var val;
           if (old != null) {
+            if (old === attrs) {
+              console.warn("Don't reuse attrs object, use new object for every redraw, this will throw in next major");
+            }
             for (var key in old) {
               if ((val = old[key]) != null && (attrs == null || attrs[key] == null)) {
                 removeAttr(vnode, key, val, ns);
               }
             }
           }
+          if (attrs != null) {
+            for (var key in attrs) {
+              setAttr(vnode, key, old && old[key], attrs[key], ns);
+            }
+          }
         }
         function isFormAttribute(vnode, attr) {
-          return attr === "value" || attr === "checked" || attr === "selectedIndex" || attr === "selected" && vnode.dom === activeElement() || vnode.tag === "option" && vnode.dom.parentNode === $doc.activeElement;
+          return attr === "value" || attr === "checked" || attr === "selectedIndex" || attr === "selected" && (vnode.dom === activeElement(vnode.dom) || vnode.tag === "option" && vnode.dom.parentNode === activeElement(vnode.dom));
         }
         function isLifecycleMethod(attr) {
           return attr === "oninit" || attr === "oncreate" || attr === "onupdate" || attr === "onremove" || attr === "onbeforeremove" || attr === "onbeforeupdate";
         }
         function hasPropertyKey(vnode, key, ns) {
           return ns === void 0 && // If it's a custom element, just keep it.
-          (vnode.tag.indexOf("-") > -1 || vnode.attrs != null && vnode.attrs.is || // If it's a normal element, let's try to avoid a few browser bugs.
+          (vnode.tag.indexOf("-") > -1 || vnode.is || // If it's a normal element, let's try to avoid a few browser bugs.
           key !== "href" && key !== "list" && key !== "form" && key !== "width" && key !== "height") && key in vnode.dom;
-        }
-        var uppercaseRegex = /[A-Z]/g;
-        function toLowerCase(capital) {
-          return "-" + capital.toLowerCase();
-        }
-        function normalizeKey(key) {
-          return key[0] === "-" && key[1] === "-" ? key : key === "cssFloat" ? "float" : key.replace(uppercaseRegex, toLowerCase);
         }
         function updateStyle(element, old, style) {
           if (old === style) {
           } else if (style == null) {
-            element.style.cssText = "";
+            element.style = "";
           } else if (typeof style !== "object") {
-            element.style.cssText = style;
+            element.style = style;
           } else if (old == null || typeof old !== "object") {
-            element.style.cssText = "";
+            element.style = "";
             for (var key in style) {
               var value = style[key];
-              if (value != null)
-                element.style.setProperty(normalizeKey(key), String(value));
+              if (value != null) {
+                if (key.includes("-")) element.style.setProperty(key, String(value));
+                else element.style[key] = String(value);
+              }
             }
           } else {
+            for (var key in old) {
+              if (old[key] != null && style[key] == null) {
+                if (key.includes("-")) element.style.removeProperty(key);
+                else element.style[key] = "";
+              }
+            }
             for (var key in style) {
               var value = style[key];
               if (value != null && (value = String(value)) !== String(old[key])) {
-                element.style.setProperty(normalizeKey(key), value);
-              }
-            }
-            for (var key in old) {
-              if (old[key] != null && style[key] == null) {
-                element.style.removeProperty(normalizeKey(key));
+                if (key.includes("-")) element.style.setProperty(key, value);
+                else element.style[key] = value;
               }
             }
           }
@@ -1163,12 +826,17 @@
         EventDict.prototype.handleEvent = function(ev) {
           var handler = this["on" + ev.type];
           var result;
-          if (typeof handler === "function")
-            result = handler.call(ev.currentTarget, ev);
-          else if (typeof handler.handleEvent === "function")
-            handler.handleEvent(ev);
-          if (this._ && ev.redraw !== false)
-            (0, this._)();
+          if (typeof handler === "function") result = handler.call(ev.currentTarget, ev);
+          else if (typeof handler.handleEvent === "function") handler.handleEvent(ev);
+          var self = this;
+          if (self._ != null) {
+            if (ev.redraw !== false) (0, self._)();
+            if (result != null && typeof result.then === "function") {
+              Promise.resolve(result).then(function() {
+                if (self._ != null && ev.redraw !== false) (0, self._)();
+              });
+            }
+          }
           if (result === false) {
             ev.preventDefault();
             ev.stopPropagation();
@@ -1177,15 +845,12 @@
         function updateEvent(vnode, key, value) {
           if (vnode.events != null) {
             vnode.events._ = currentRedraw;
-            if (vnode.events[key] === value)
-              return;
+            if (vnode.events[key] === value) return;
             if (value != null && (typeof value === "function" || typeof value === "object")) {
-              if (vnode.events[key] == null)
-                vnode.dom.addEventListener(key.slice(2), vnode.events, false);
+              if (vnode.events[key] == null) vnode.dom.addEventListener(key.slice(2), vnode.events, false);
               vnode.events[key] = value;
             } else {
-              if (vnode.events[key] != null)
-                vnode.dom.removeEventListener(key.slice(2), vnode.events, false);
+              if (vnode.events[key] != null) vnode.dom.removeEventListener(key.slice(2), vnode.events, false);
               vnode.events[key] = void 0;
             }
           } else if (value != null && (typeof value === "function" || typeof value === "object")) {
@@ -1195,26 +860,21 @@
           }
         }
         function initLifecycle(source, vnode, hooks) {
-          if (typeof source.oninit === "function")
-            callHook.call(source.oninit, vnode);
-          if (typeof source.oncreate === "function")
-            hooks.push(callHook.bind(source.oncreate, vnode));
+          if (typeof source.oninit === "function") callHook.call(source.oninit, vnode);
+          if (typeof source.oncreate === "function") hooks.push(callHook.bind(source.oncreate, vnode));
         }
         function updateLifecycle(source, vnode, hooks) {
-          if (typeof source.onupdate === "function")
-            hooks.push(callHook.bind(source.onupdate, vnode));
+          if (typeof source.onupdate === "function") hooks.push(callHook.bind(source.onupdate, vnode));
         }
         function shouldNotUpdate(vnode, old) {
           do {
             if (vnode.attrs != null && typeof vnode.attrs.onbeforeupdate === "function") {
               var force = callHook.call(vnode.attrs.onbeforeupdate, vnode, old);
-              if (force !== void 0 && !force)
-                break;
+              if (force !== void 0 && !force) break;
             }
             if (typeof vnode.tag !== "string" && typeof vnode.state.onbeforeupdate === "function") {
               var force = callHook.call(vnode.state.onbeforeupdate, vnode, old);
-              if (force !== void 0 && !force)
-                break;
+              if (force !== void 0 && !force) break;
             }
             return false;
           } while (false);
@@ -1228,28 +888,25 @@
         }
         var currentDOM;
         return function(dom, vnodes, redraw) {
-          if (!dom)
-            throw new TypeError("DOM element being rendered to does not exist.");
+          if (!dom) throw new TypeError("DOM element being rendered to does not exist.");
           if (currentDOM != null && dom.contains(currentDOM)) {
             throw new TypeError("Node is currently being rendered to and thus is locked.");
           }
           var prevRedraw = currentRedraw;
           var prevDOM = currentDOM;
           var hooks = [];
-          var active = activeElement();
+          var active = activeElement(dom);
           var namespace = dom.namespaceURI;
           currentDOM = dom;
           currentRedraw = typeof redraw === "function" ? redraw : void 0;
+          currentRender = {};
           try {
-            if (dom.vnodes == null)
-              dom.textContent = "";
+            if (dom.vnodes == null) dom.textContent = "";
             vnodes = Vnode.normalizeChildren(Array.isArray(vnodes) ? vnodes : [vnodes]);
             updateNodes(dom, dom.vnodes, vnodes, hooks, null, namespace === "http://www.w3.org/1999/xhtml" ? void 0 : namespace);
             dom.vnodes = vnodes;
-            if (active != null && activeElement() !== active && typeof active.focus === "function")
-              active.focus();
-            for (var i = 0; i < hooks.length; i++)
-              hooks[i]();
+            if (active != null && activeElement(dom) !== active && typeof active.focus === "function") active.focus();
+            for (var i = 0; i < hooks.length; i++) hooks[i]();
           } finally {
             currentRedraw = prevRedraw;
             currentDOM = prevDOM;
@@ -1303,8 +960,7 @@
           var index = subscriptions.indexOf(root);
           if (index >= 0) {
             subscriptions.splice(index, 2);
-            if (index <= offset)
-              offset -= 2;
+            if (index <= offset) offset -= 2;
             render(root, []);
           }
           if (component != null) {
@@ -1331,8 +987,7 @@
     "node_modules/mithril/querystring/build.js"(exports, module) {
       "use strict";
       module.exports = function(object) {
-        if (Object.prototype.toString.call(object) !== "[object Object]")
-          return "";
+        if (Object.prototype.toString.call(object) !== "[object Object]") return "";
         var args = [];
         for (var key in object) {
           destructure(key, object[key]);
@@ -1347,22 +1002,7 @@
             for (var i in value) {
               destructure(key2 + "[" + i + "]", value[i]);
             }
-          } else
-            args.push(encodeURIComponent(key2) + (value != null && value !== "" ? "=" + encodeURIComponent(value) : ""));
-        }
-      };
-    }
-  });
-
-  // node_modules/mithril/util/assign.js
-  var require_assign = __commonJS({
-    "node_modules/mithril/util/assign.js"(exports, module) {
-      "use strict";
-      var hasOwn = require_hasOwn();
-      module.exports = Object.assign || function(target, source) {
-        for (var key in source) {
-          if (hasOwn.call(source, key))
-            target[key] = source[key];
+          } else args.push(encodeURIComponent(key2) + (value != null && value !== "" ? "=" + encodeURIComponent(value) : ""));
         }
       };
     }
@@ -1373,24 +1013,21 @@
     "node_modules/mithril/pathname/build.js"(exports, module) {
       "use strict";
       var buildQueryString = require_build();
-      var assign = require_assign();
       module.exports = function(template, params) {
         if (/:([^\/\.-]+)(\.{3})?:/.test(template)) {
           throw new SyntaxError("Template parameter names must be separated by either a '/', '-', or '.'.");
         }
-        if (params == null)
-          return template;
+        if (params == null) return template;
         var queryIndex = template.indexOf("?");
         var hashIndex = template.indexOf("#");
         var queryEnd = hashIndex < 0 ? template.length : hashIndex;
         var pathEnd = queryIndex < 0 ? queryEnd : queryIndex;
         var path = template.slice(0, pathEnd);
         var query = {};
-        assign(query, params);
+        Object.assign(query, params);
         var resolved = path.replace(/:([^\/\.-]+)(\.{3})?/g, function(m5, key, variadic) {
           delete query[key];
-          if (params[key] == null)
-            return m5;
+          if (params[key] == null) return m5;
           return variadic ? params[key] : encodeURIComponent(String(params[key]));
         });
         var newQueryIndex = resolved.indexOf("?");
@@ -1398,17 +1035,12 @@
         var newQueryEnd = newHashIndex < 0 ? resolved.length : newHashIndex;
         var newPathEnd = newQueryIndex < 0 ? newQueryEnd : newQueryIndex;
         var result = resolved.slice(0, newPathEnd);
-        if (queryIndex >= 0)
-          result += template.slice(queryIndex, queryEnd);
-        if (newQueryIndex >= 0)
-          result += (queryIndex < 0 ? "?" : "&") + resolved.slice(newQueryIndex, newQueryEnd);
+        if (queryIndex >= 0) result += template.slice(queryIndex, queryEnd);
+        if (newQueryIndex >= 0) result += (queryIndex < 0 ? "?" : "&") + resolved.slice(newQueryIndex, newQueryEnd);
         var querystring = buildQueryString(query);
-        if (querystring)
-          result += (queryIndex < 0 && newQueryIndex < 0 ? "?" : "&") + querystring;
-        if (hashIndex >= 0)
-          result += template.slice(hashIndex);
-        if (newHashIndex >= 0)
-          result += (hashIndex < 0 ? "" : "&") + resolved.slice(newHashIndex);
+        if (querystring) result += (queryIndex < 0 && newQueryIndex < 0 ? "?" : "&") + querystring;
+        if (hashIndex >= 0) result += template.slice(hashIndex);
+        if (newHashIndex >= 0) result += (hashIndex < 0 ? "" : "&") + resolved.slice(newHashIndex);
         return result;
       };
     }
@@ -1420,67 +1052,13 @@
       "use strict";
       var buildPathname = require_build2();
       var hasOwn = require_hasOwn();
-      module.exports = function($window, Promise2, oncompletion) {
-        var callbackCount = 0;
+      module.exports = function($window, oncompletion) {
         function PromiseProxy(executor) {
-          return new Promise2(executor);
+          return new Promise(executor);
         }
-        PromiseProxy.prototype = Promise2.prototype;
-        PromiseProxy.__proto__ = Promise2;
-        function makeRequest(factory) {
-          return function(url, args) {
-            if (typeof url !== "string") {
-              args = url;
-              url = url.url;
-            } else if (args == null)
-              args = {};
-            var promise = new Promise2(function(resolve, reject) {
-              factory(buildPathname(url, args.params), args, function(data) {
-                if (typeof args.type === "function") {
-                  if (Array.isArray(data)) {
-                    for (var i = 0; i < data.length; i++) {
-                      data[i] = new args.type(data[i]);
-                    }
-                  } else
-                    data = new args.type(data);
-                }
-                resolve(data);
-              }, reject);
-            });
-            if (args.background === true)
-              return promise;
-            var count = 0;
-            function complete() {
-              if (--count === 0 && typeof oncompletion === "function")
-                oncompletion();
-            }
-            return wrap(promise);
-            function wrap(promise2) {
-              var then = promise2.then;
-              promise2.constructor = PromiseProxy;
-              promise2.then = function() {
-                count++;
-                var next = then.apply(promise2, arguments);
-                next.then(complete, function(e) {
-                  complete();
-                  if (count === 0)
-                    throw e;
-                });
-                return wrap(next);
-              };
-              return promise2;
-            }
-          };
-        }
-        function hasHeader(args, name) {
-          for (var key in args.headers) {
-            if (hasOwn.call(args.headers, key) && key.toLowerCase() === name)
-              return true;
-          }
-          return false;
-        }
-        return {
-          request: makeRequest(function(url, args, resolve, reject) {
+        function makeRequest(url, args) {
+          return new Promise(function(resolve, reject) {
+            url = buildPathname(url, args.params);
             var method = args.method != null ? args.method.toUpperCase() : "GET";
             var body = args.body;
             var assumeJSON = (args.serialize == null || args.serialize === JSON.serialize) && !(body instanceof $window.FormData || body instanceof $window.URLSearchParams);
@@ -1499,10 +1077,8 @@
             if (typeof args.deserialize !== "function" && !hasHeader(args, "accept")) {
               xhr.setRequestHeader("Accept", "application/json, text/*");
             }
-            if (args.withCredentials)
-              xhr.withCredentials = args.withCredentials;
-            if (args.timeout)
-              xhr.timeout = args.timeout;
+            if (args.withCredentials) xhr.withCredentials = args.withCredentials;
+            if (args.timeout) xhr.timeout = args.timeout;
             xhr.responseType = responseType;
             for (var key in args.headers) {
               if (hasOwn.call(args.headers, key)) {
@@ -1510,8 +1086,7 @@
               }
             }
             xhr.onreadystatechange = function(ev) {
-              if (aborted)
-                return;
+              if (aborted) return;
               if (ev.target.readyState === 4) {
                 try {
                   var success = ev.target.status >= 200 && ev.target.status < 300 || ev.target.status === 304 || /^file:\/\//i.test(url);
@@ -1525,8 +1100,7 @@
                       }
                     }
                   } else if (!responseType || responseType === "text") {
-                    if (response == null)
-                      response = ev.target.responseText;
+                    if (response == null) response = ev.target.responseText;
                   }
                   if (typeof args.extract === "function") {
                     response = args.extract(ev.target, args);
@@ -1534,9 +1108,16 @@
                   } else if (typeof args.deserialize === "function") {
                     response = args.deserialize(response);
                   }
-                  if (success)
+                  if (success) {
+                    if (typeof args.type === "function") {
+                      if (Array.isArray(response)) {
+                        for (var i = 0; i < response.length; i++) {
+                          response[i] = new args.type(response[i]);
+                        }
+                      } else response = new args.type(response);
+                    }
                     resolve(response);
-                  else {
+                  } else {
                     var completeErrorResponse = function() {
                       try {
                         message = ev.target.responseText;
@@ -1550,12 +1131,10 @@
                     };
                     if (xhr.status === 0) {
                       setTimeout(function() {
-                        if (isTimeout)
-                          return;
+                        if (isTimeout) return;
                         completeErrorResponse();
                       });
-                    } else
-                      completeErrorResponse();
+                    } else completeErrorResponse();
                   }
                 } catch (e) {
                   reject(e);
@@ -1578,31 +1157,48 @@
                 };
               }
             }
-            if (body == null)
-              xhr.send();
-            else if (typeof args.serialize === "function")
-              xhr.send(args.serialize(body));
-            else if (body instanceof $window.FormData || body instanceof $window.URLSearchParams)
-              xhr.send(body);
-            else
-              xhr.send(JSON.stringify(body));
-          }),
-          jsonp: makeRequest(function(url, args, resolve, reject) {
-            var callbackName = args.callbackName || "_mithril_" + Math.round(Math.random() * 1e16) + "_" + callbackCount++;
-            var script = $window.document.createElement("script");
-            $window[callbackName] = function(data) {
-              delete $window[callbackName];
-              script.parentNode.removeChild(script);
-              resolve(data);
-            };
-            script.onerror = function() {
-              delete $window[callbackName];
-              script.parentNode.removeChild(script);
-              reject(new Error("JSONP request failed"));
-            };
-            script.src = url + (url.indexOf("?") < 0 ? "?" : "&") + encodeURIComponent(args.callbackKey || "callback") + "=" + encodeURIComponent(callbackName);
-            $window.document.documentElement.appendChild(script);
-          })
+            if (body == null) xhr.send();
+            else if (typeof args.serialize === "function") xhr.send(args.serialize(body));
+            else if (body instanceof $window.FormData || body instanceof $window.URLSearchParams) xhr.send(body);
+            else xhr.send(JSON.stringify(body));
+          });
+        }
+        PromiseProxy.prototype = Promise.prototype;
+        PromiseProxy.__proto__ = Promise;
+        function hasHeader(args, name) {
+          for (var key in args.headers) {
+            if (hasOwn.call(args.headers, key) && key.toLowerCase() === name) return true;
+          }
+          return false;
+        }
+        return {
+          request: function(url, args) {
+            if (typeof url !== "string") {
+              args = url;
+              url = url.url;
+            } else if (args == null) args = {};
+            var promise = makeRequest(url, args);
+            if (args.background === true) return promise;
+            var count = 0;
+            function complete() {
+              if (--count === 0 && typeof oncompletion === "function") oncompletion();
+            }
+            return wrap(promise);
+            function wrap(promise2) {
+              var then = promise2.then;
+              promise2.constructor = PromiseProxy;
+              promise2.then = function() {
+                count++;
+                var next = then.apply(promise2, arguments);
+                next.then(complete, function(e) {
+                  complete();
+                  if (count === 0) throw e;
+                });
+                return wrap(next);
+              };
+              return promise2;
+            }
+          }
         };
       };
     }
@@ -1612,9 +1208,8 @@
   var require_request2 = __commonJS({
     "node_modules/mithril/request.js"(exports, module) {
       "use strict";
-      var PromisePolyfill = require_promise();
       var mountRedraw = require_mount_redraw2();
-      module.exports = require_request()(typeof window !== "undefined" ? window : null, PromisePolyfill, mountRedraw.redraw);
+      module.exports = require_request()(typeof window !== "undefined" ? window : null, mountRedraw.redraw);
     }
   });
 
@@ -1630,23 +1225,18 @@
         }
       }
       module.exports = function(string) {
-        if (string === "" || string == null)
-          return {};
-        if (string.charAt(0) === "?")
-          string = string.slice(1);
+        if (string === "" || string == null) return {};
+        if (string.charAt(0) === "?") string = string.slice(1);
         var entries = string.split("&"), counters = {}, data = {};
         for (var i = 0; i < entries.length; i++) {
           var entry = entries[i].split("=");
           var key = decodeURIComponentSave(entry[0]);
           var value = entry.length === 2 ? decodeURIComponentSave(entry[1]) : "";
-          if (value === "true")
-            value = true;
-          else if (value === "false")
-            value = false;
+          if (value === "true") value = true;
+          else if (value === "false") value = false;
           var levels = key.split(/\]\[?|\[/);
           var cursor = data;
-          if (key.indexOf("[") > -1)
-            levels.pop();
+          if (key.indexOf("[") > -1) levels.pop();
           for (var j = 0; j < levels.length; j++) {
             var level = levels[j], nextLevel = levels[j + 1];
             var isNumber = nextLevel == "" || !isNaN(parseInt(nextLevel, 10));
@@ -1656,16 +1246,12 @@
                 counters[key] = Array.isArray(cursor) ? cursor.length : 0;
               }
               level = counters[key]++;
-            } else if (level === "__proto__")
-              break;
-            if (j === levels.length - 1)
-              cursor[level] = value;
+            } else if (level === "__proto__") break;
+            if (j === levels.length - 1) cursor[level] = value;
             else {
               var desc = Object.getOwnPropertyDescriptor(cursor, level);
-              if (desc != null)
-                desc = desc.value;
-              if (desc == null)
-                cursor[level] = desc = isNumber ? [] : {};
+              if (desc != null) desc = desc.value;
+              if (desc == null) cursor[level] = desc = isNumber ? [] : {};
               cursor = desc;
             }
           }
@@ -1686,13 +1272,9 @@
         var queryEnd = hashIndex < 0 ? url.length : hashIndex;
         var pathEnd = queryIndex < 0 ? queryEnd : queryIndex;
         var path = url.slice(0, pathEnd).replace(/\/{2,}/g, "/");
-        if (!path)
-          path = "/";
+        if (!path) path = "/";
         else {
-          if (path[0] !== "/")
-            path = "/" + path;
-          if (path.length > 1 && path[path.length - 1] === "/")
-            path = path.slice(0, -1);
+          if (path[0] !== "/") path = "/" + path;
         }
         return {
           path,
@@ -1718,26 +1300,20 @@
           // ban it from template parameters.
           /:([^\/.-]+)(\.{3}|\.(?!\.)|-)?|[\\^$*+.()|\[\]{}]/g,
           function(m5, key, extra) {
-            if (key == null)
-              return "\\" + m5;
+            if (key == null) return "\\" + m5;
             keys.push({ k: key, r: extra === "..." });
-            if (extra === "...")
-              return "(.*)";
-            if (extra === ".")
-              return "([^/]+)\\.";
+            if (extra === "...") return "(.*)";
+            if (extra === ".") return "([^/]+)\\.";
             return "([^/]+)" + (extra || "");
           }
-        ) + "$");
+        ) + "\\/?$");
         return function(data) {
           for (var i = 0; i < templateKeys.length; i++) {
-            if (templateData.params[templateKeys[i]] !== data.params[templateKeys[i]])
-              return false;
+            if (templateData.params[templateKeys[i]] !== data.params[templateKeys[i]]) return false;
           }
-          if (!keys.length)
-            return regexp.test(data.path);
+          if (!keys.length) return regexp.test(data.path);
           var values = regexp.exec(data.path);
-          if (values == null)
-            return false;
+          if (values == null) return false;
           for (var i = 0; i < keys.length; i++) {
             data.params[keys[i].k] = keys[i].r ? values[i + 1] : decodeURIComponent(values[i + 1]);
           }
@@ -1779,13 +1355,10 @@
       "use strict";
       var Vnode = require_vnode();
       var m5 = require_hyperscript();
-      var Promise2 = require_promise();
       var buildPathname = require_build2();
       var parsePathname = require_parse2();
       var compileTemplate = require_compileTemplate();
-      var assign = require_assign();
       var censor = require_censor();
-      var sentinel = {};
       function decodeURIComponentSave(component) {
         try {
           return decodeURIComponent(component);
@@ -1795,28 +1368,21 @@
       }
       module.exports = function($window, mountRedraw) {
         var callAsync = $window == null ? null : typeof $window.setImmediate === "function" ? $window.setImmediate : $window.setTimeout;
-        var p = Promise2.resolve();
+        var p = Promise.resolve();
         var scheduled = false;
         var ready = false;
-        var state2 = 0;
-        var compiled, fallbackRoute;
-        var currentResolver = sentinel, component, attrs, currentPath, lastUpdate;
+        var hasBeenResolved = false;
+        var dom, compiled, fallbackRoute;
+        var currentResolver, component, attrs, currentPath, lastUpdate;
         var RouterRoot = {
-          onbeforeupdate: function() {
-            state2 = state2 ? 2 : 1;
-            return !(!state2 || sentinel === currentResolver);
-          },
           onremove: function() {
+            ready = hasBeenResolved = false;
             $window.removeEventListener("popstate", fireAsync, false);
-            $window.removeEventListener("hashchange", resolveRoute, false);
           },
           view: function() {
-            if (!state2 || sentinel === currentResolver)
-              return;
-            var vnode = [Vnode(component, attrs.key, attrs)];
-            if (currentResolver)
-              vnode = currentResolver.render(vnode[0]);
-            return vnode;
+            var vnode = Vnode(component, attrs.key, attrs);
+            if (currentResolver) return currentResolver.render(vnode);
+            return [vnode];
           }
         };
         var SKIP = route.SKIP = {};
@@ -1827,16 +1393,15 @@
             prefix = $window.location.search + prefix;
             if (route.prefix[0] !== "?") {
               prefix = $window.location.pathname + prefix;
-              if (prefix[0] !== "/")
-                prefix = "/" + prefix;
+              if (prefix[0] !== "/") prefix = "/" + prefix;
             }
           }
           var path = prefix.concat().replace(/(?:%[a-f89][a-f0-9])+/gim, decodeURIComponentSave).slice(route.prefix.length);
           var data = parsePathname(path);
-          assign(data.params, $window.history.state);
+          Object.assign(data.params, $window.history.state);
           function reject(e) {
             console.error(e);
-            setPath(fallbackRoute, null, { replace: true });
+            route.set(fallbackRoute, null, { replace: true });
           }
           loop(0);
           function loop(i) {
@@ -1846,18 +1411,15 @@
                 var matchedRoute = compiled[i].route;
                 var localComp = payload;
                 var update = lastUpdate = function(comp) {
-                  if (update !== lastUpdate)
-                    return;
-                  if (comp === SKIP)
-                    return loop(i + 1);
+                  if (update !== lastUpdate) return;
+                  if (comp === SKIP) return loop(i + 1);
                   component = comp != null && (typeof comp.view === "function" || typeof comp === "function") ? comp : "div";
                   attrs = data.params, currentPath = path, lastUpdate = null;
                   currentResolver = payload.render ? payload : null;
-                  if (state2 === 2)
-                    mountRedraw.redraw();
+                  if (hasBeenResolved) mountRedraw.redraw();
                   else {
-                    state2 = 2;
-                    mountRedraw.redraw.sync();
+                    hasBeenResolved = true;
+                    mountRedraw.mount(dom, RouterRoot);
                   }
                 };
                 if (payload.view || typeof payload === "function") {
@@ -1867,15 +1429,16 @@
                   p.then(function() {
                     return payload.onmatch(data.params, path, matchedRoute);
                   }).then(update, path === fallbackRoute ? null : reject);
-                } else
-                  update("div");
+                } else update(
+                  /* "div" */
+                );
                 return;
               }
             }
             if (path === fallbackRoute) {
               throw new Error("Could not resolve default route " + fallbackRoute + ".");
             }
-            setPath(fallbackRoute, null, { replace: true });
+            route.set(fallbackRoute, null, { replace: true });
           }
         }
         function fireAsync() {
@@ -1884,26 +1447,10 @@
             callAsync(resolveRoute);
           }
         }
-        function setPath(path, data, options) {
-          path = buildPathname(path, data);
-          if (ready) {
-            fireAsync();
-            var state3 = options ? options.state : null;
-            var title = options ? options.title : null;
-            if (options && options.replace)
-              $window.history.replaceState(state3, title, route.prefix + path);
-            else
-              $window.history.pushState(state3, title, route.prefix + path);
-          } else {
-            $window.location.href = route.prefix + path;
-          }
-        }
         function route(root, defaultRoute, routes) {
-          if (!root)
-            throw new TypeError("DOM element being rendered to does not exist.");
+          if (!root) throw new TypeError("DOM element being rendered to does not exist.");
           compiled = Object.keys(routes).map(function(route2) {
-            if (route2[0] !== "/")
-              throw new SyntaxError("Routes must start with a '/'.");
+            if (route2[0] !== "/") throw new SyntaxError("Routes must start with a '/'.");
             if (/:([^\/\.-]+)(\.{3})?:/.test(route2)) {
               throw new SyntaxError("Route parameter names must be separated with either '/', '.', or '-'.");
             }
@@ -1922,13 +1469,9 @@
               throw new ReferenceError("Default route doesn't match any known routes.");
             }
           }
-          if (typeof $window.history.pushState === "function") {
-            $window.addEventListener("popstate", fireAsync, false);
-          } else if (route.prefix[0] === "#") {
-            $window.addEventListener("hashchange", resolveRoute, false);
-          }
+          dom = root;
+          $window.addEventListener("popstate", fireAsync, false);
           ready = true;
-          mountRedraw.mount(root, RouterRoot);
           resolveRoute();
         }
         route.set = function(path, data, options) {
@@ -1937,7 +1480,16 @@
             options.replace = true;
           }
           lastUpdate = null;
-          setPath(path, data, options);
+          path = buildPathname(path, data);
+          if (ready) {
+            fireAsync();
+            var state2 = options ? options.state : null;
+            var title = options ? options.title : null;
+            if (options && options.replace) $window.history.replaceState(state2, title, route.prefix + path);
+            else $window.history.pushState(state2, title, route.prefix + path);
+          } else {
+            $window.location.href = route.prefix + path;
+          }
         };
         route.get = function() {
           return currentPath;
@@ -2007,6 +1559,7 @@
       var hyperscript = require_hyperscript2();
       var request = require_request2();
       var mountRedraw = require_mount_redraw2();
+      var domFor = require_domFor();
       var m5 = function m6() {
         return hyperscript.apply(this, arguments);
       };
@@ -2019,14 +1572,13 @@
       m5.render = require_render2();
       m5.redraw = mountRedraw.redraw;
       m5.request = request.request;
-      m5.jsonp = request.jsonp;
       m5.parseQueryString = require_parse();
       m5.buildQueryString = require_build();
       m5.parsePathname = require_parse2();
       m5.buildPathname = require_build2();
       m5.vnode = require_vnode();
-      m5.PromisePolyfill = require_polyfill();
       m5.censor = require_censor();
+      m5.domFor = domFor.domFor;
       module.exports = m5;
     }
   });
@@ -2046,11 +1598,11 @@
         {
           class: [
             "flex-1 flex flex-col bg-orange-500 overflow-hidden relative border-2 rounded-lg",
+            tile.OnFire || "cursor-pointer",
             tile.Position == state2.Dragon.Position ? state2.Dragon.OnFire || !state2.Dragon.Hidden && (state2.Knights.find((k) => k.Position == tile.Position) || tile.Arrows.length) ? "border-red-500" : "border-green-500" : !tile.Arrows.length && state2.Archers.find((a) => a.Position == tile.Position && a.AP) ? "border-yellow-300" : "border-lime-950"
             // Dragon
           ].join(" "),
           onclick: (e) => {
-            console.log("click tile");
             state2.TileClick(tile.Position);
           }
         },
@@ -2073,7 +1625,6 @@
           ].join(" ") })
         ),
         /* @__PURE__ */ (0, import_mithril.default)("div", { class: "z-20 h-full flex flex-col" }, /* @__PURE__ */ (0, import_mithril.default)("div", { class: "flex-1 flex" }, /* @__PURE__ */ (0, import_mithril.default)("div", { class: "flex-1 flex flex-col relative" }, state2.Peasants.filter((p) => p.Position == tile.Position).map((p) => /* @__PURE__ */ (0, import_mithril.default)("div", { class: "flex-1", onclick: (e) => {
-          console.log("click peasant");
           if (p.Position == state2.Dragon.Position) {
             state2.Dragon.Hidden = false;
             p.Chomp();
@@ -2088,7 +1639,6 @@
               state2.Dragon.OnFire ? state2.Dragon.AP ? "onfire" : "onfire rotate-90" : ""
             ].join(" "),
             onclick: () => {
-              console.log("click dragon");
               return state2.Use();
             }
           }
@@ -2216,7 +1766,6 @@ ${window.location.href}`;
         dest = options.filter((x) => x != this.LastMove).find((x, i, s) => Math.floor(s.length * r) == i);
       }
       if (dest == void 0) {
-        console.log("move", this, { options });
         return;
       }
       let v = ["North", "South"];
@@ -2228,14 +1777,12 @@ ${window.location.href}`;
       return this.Position;
     }
     Burn(AP = 4) {
-      console.log("burn", this);
       this.OnFire = true;
       this.AP = AP;
       this.CanDiagonal = false;
       return this.AP;
     }
     Chomp() {
-      console.log("chomp");
       this.Position = HEART;
       this.OnFire = false;
       this.AP = 0;
@@ -2284,8 +1831,7 @@ ${window.location.href}`;
       }, init);
     }
     Move(dest, AP) {
-      if (this.AP == 0 && !AP && this.OnFire)
-        return this.Void();
+      if (this.AP == 0 && !AP && this.OnFire) return this.Void();
       return super.Move(dest, AP);
     }
   };
@@ -2390,11 +1936,8 @@ ${window.location.href}`;
       var rn = [12];
       while (rn.length < 10) {
         var r = Math.floor(Math.random() * 25);
-        if (rn.indexOf(r) === -1)
-          rn.push(r);
+        if (rn.indexOf(r) === -1) rn.push(r);
       }
-      console.log("next");
-      console.log(rn);
       this.Level += 1;
       this.Tiles = terrain.map((t) => new Tile2({ Terrain: t }));
       this.Dragon = new Dragon({ Position: rn[0] });
@@ -2421,18 +1964,15 @@ ${window.location.href}`;
       }
       this.Peasants.forEach((p) => {
         if (p.Position == HEART && spawn.length && this.Peasants.filter((p2) => p2.Position > -1).length < 4) {
-          console.log("spawn");
           p.Move(spawn.pop());
         }
       });
     }
     MovePeasant(p) {
-      if (p.Position < 0)
-        return;
+      if (p.Position < 0) return;
       if (p.OnFire) {
         p.Move();
-        if (p.Position < 0)
-          return;
+        if (p.Position < 0) return;
         if (this.Tiles[p.Position].Terrain == "lake") {
           p.OnFire = false;
           p.AP = 0;
@@ -2442,11 +1982,9 @@ ${window.location.href}`;
       } else if (Math.random() * 5 > 4) {
         p.CanDiagonal = true;
         p.Move();
-        if (Math.round(Math.random()))
-          this.Tiles[p.Position].Repair();
+        if (Math.round(Math.random())) this.Tiles[p.Position].Repair();
       }
-      if (p.Ap < 0)
-        return;
+      if (p.Ap < 0) return;
       this.Tiles.filter((t, i) => p.Position == i).forEach((t) => t.OnFire == p.OnFire);
     }
     CheckDamage() {
@@ -2455,13 +1993,11 @@ ${window.location.href}`;
       this.Peasants.forEach((p) => {
         this.MovePeasant(p);
         if (p.Position == HEART && dmg) {
-          console.log("SWORDED");
           dmg--;
           p.Void();
         }
       });
       this.Peasants.filter((p) => !p.OnFire && this.Peasants.find((x) => x.OnFire && x.Position == p.Position)).forEach((p) => {
-        console.log("CHAIN");
         p.Burn();
       });
       if (dmg && this.Peasants.every((x) => x.Position != HEART)) {
@@ -2472,18 +2008,16 @@ ${window.location.href}`;
     Move(dest) {
       this.Dragon.Hidden = false;
       this.Moves += 1;
-      if (this.Dragon.OnFire)
-        return;
-      if (Object.entries(this.Dragon.GetNeighbors()).find((d) => d[0] == dest && d[1] == void 0))
-        return;
+      if (this.Dragon.OnFire) return;
+      if (Object.entries(this.Dragon.GetNeighbors()).find((d) => d[0] == dest && d[1] == void 0)) return;
       this.Dragon.Move(dest);
       this.MoveEnemies();
       this.SpawnPeasants();
+      this.Burn();
       localStorage.setItem("state", JSON.stringify(this));
       return this.CheckDamage();
     }
     Rage(AP) {
-      console.log("rage", this);
       this.Dragon.Move();
       this.Burn();
       import_mithril3.default.redraw();
@@ -2492,7 +2026,6 @@ ${window.location.href}`;
         setTimeout(() => this.Rage(), 300);
     }
     Use() {
-      console.log("use");
       if (!this.Dragon.Hidden && this.Peasants.find((p) => p.Position == this.Dragon.Position)?.Chomp()) {
         return false;
       }
@@ -2513,8 +2046,7 @@ ${window.location.href}`;
         }
         this.Use();
       }
-      if (Object.values(this.Dragon.GetNeighbors(false)).includes(Position) || [this.Dragon.Position, Position].map((x) => this.Tiles[x].Terrain).every((x) => x == "tunnel"))
-        this.Move(Position);
+      if (Object.values(this.Dragon.GetNeighbors(false)).includes(Position) || [this.Dragon.Position, Position].map((x) => this.Tiles[x].Terrain).every((x) => x == "tunnel")) this.Move(Position);
       if (Position != this.Dragon.Position && Position % 5 == this.Dragon.Position % 5) {
         if (Position > this.Dragon.Position) {
           this.Move("South");
@@ -2557,7 +2089,6 @@ ${window.location.href}`;
       }
       this.Cottages.find((c) => {
         if (c.Position == this.Dragon.Position) {
-          console.log(c.GetNeighbors(true));
         }
         return c.Position == this.Dragon.Position && (this.Dragon.OnFire || this.Tiles[c.Position].OnFire && Object.values(c.GetNeighbors(false)).every((x) => isNaN(x) || this.Tiles[x].OnFire));
       })?.Burn();
@@ -2589,8 +2120,7 @@ ${window.location.href}`;
       this.ws.onmessage = this.onmessage;
       this.ws.onclose = () => setTimeout(() => {
         this.start();
-        if (this.t < 10 * 1e3)
-          this.t += 200;
+        if (this.t < 10 * 1e3) this.t += 200;
       }, this.t);
     }
   };
@@ -2679,8 +2209,7 @@ ${window.location.href}`;
     }
   };
   document.onkeydown = function(e) {
-    if (state.Dragon.OnFire || state.End())
-      return;
+    if (state.Dragon.OnFire || state.End()) return;
     e = e || window.event;
     press(e);
     import_mithril4.default.redraw();
