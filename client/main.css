@@ -31,6 +31,12 @@
   color: #FF0000;
 	animation: gradient 5s infinite;
 }
+.tile {
+  cursor: pointer;
+}
+.tile.onfire {
+  cursor: unset;
+}
 
 @keyframes gradient {
   0% {

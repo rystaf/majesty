@@ -1,23 +1,22 @@
 window.tileClick = e => {
   if (e.target.tagName == "INPUT") return
   input = e.currentTarget.querySelector("input")
-  console.log(input)
   input?.click()
 }
 
-import WSConnection from './ws.js'
-new WSConnection({
-  port: 8083,
-  onmessage: msg => {
-    if (msg.data) {
-      console.log("reload:",msg.data)
-      window.location.reload()
-    }
-  }
-})
-new WSConnection({
-  //onmessage: msg => document.getElementsByTagName("form")[0].submit()
-})
+//import WSConnection from './ws.js'
+//new WSConnection({
+//  port: 8083,
+//  onmessage: msg => {
+//    if (msg.data) {
+//      console.log("reload:",msg.data)
+//      window.location.reload()
+//    }
+//  }
+//})
+//new WSConnection({
+//  //onmessage: msg => document.getElementsByTagName("form")[0].submit()
+//})
 
 window.oncontextmenu = function ()
 {
@@ -57,7 +56,6 @@ function clickable(el) {
 };
 document.onkeydown = function (e) {
   e = e || window.event;
-  console.log(e.keyCode)
   switch(e.keyCode) {
     case 8: // backspace
       document.querySelector("input[value=Undo]").click()

@@ -5,6 +5,7 @@ class Tile {
     <div 
       class={[
         "flex-1 flex flex-col bg-orange-500 overflow-hidden relative border-2 rounded-lg",
+        tile.OnFire || "cursor-pointer",
         tile.Position == state.Dragon.Position
           ? state.Dragon.OnFire || !state.Dragon.Hidden && (state.Knights.find(k => k.Position == tile.Position) || tile.Arrows.length)
             ? "border-red-500"    // Damage
@@ -14,7 +15,6 @@ class Tile {
             : "border-lime-950",  // Dragon
       ].join(" ")}
       onclick={e=>{
-        console.log("click tile")
         state.TileClick(tile.Position)
       }}
     >
@@ -44,7 +44,6 @@ class Tile {
           { 
             state.Peasants.filter(p => p.Position == tile.Position).map(p => (
               <div class="flex-1" onclick={e=>{
-                console.log("click peasant")
                 if (p.Position == state.Dragon.Position) {
                   state.Dragon.Hidden = false
                   p.Chomp()
@@ -68,7 +67,6 @@ class Tile {
                   : "",
               ].join(" ")}
                 onclick={ () => {
-                  console.log("click dragon")
                   return state.Use()
                 }}
                 ></div>

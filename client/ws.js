@@ -1,6 +1,6 @@
 export default class WSConnection {
   constructor(config){
-    console.log("new ws", config)
+    if (window.location.hash != "#dev") return;
     this.t = 800
     this.port = config?.port || window.location.port
     this.onmessage = config?.onmessage

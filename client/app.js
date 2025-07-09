@@ -2,7 +2,7 @@ import m from 'mithril';
 import Layout from './components/Layout';
 import Game from './state';
 
-const localState =  false //JSON.parse(localStorage.getItem('state'));
+const localState = window.location.hash == '#dev' && JSON.parse(localStorage.getItem('state'));
 const state = localState ? new Game(localState) : new Game({},
   [
     "stump",
@@ -41,13 +41,9 @@ const state = localState ? new Game(localState) : new Game({},
 import WSConnection from './ws'
 new WSConnection({
   port: 8083,
-  onmessage: msg => {
-    if (msg.data) {
-      console.log("reload:",msg.data)
-      window.location.reload()
-    }
-  }
+  onmessage: msg => window.location.reload()
 })
+
 m.mount(document.getElementById("app"), {
   view: () => m(Layout, { state })
 });

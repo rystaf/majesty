@@ -70,8 +70,6 @@ export default class Game {
         var r = Math.floor(Math.random() * 25);
         if(rn.indexOf(r) === -1) rn.push(r);
     }
-    console.log("next")
-    console.log(rn)
     this.Level += 1
     this.Tiles =  terrain.map(t => new Tile({ Terrain: t}))
     this.Dragon = new Dragon({ Position: rn[0] })
@@ -102,7 +100,6 @@ export default class Game {
     }
     this.Peasants.forEach(p => {
       if (p.Position == HEART && spawn.length && this.Peasants.filter(p => p.Position > -1).length < 4) {
-        console.log("spawn")
         p.Move(spawn.pop())
       }
     })
@@ -134,7 +131,6 @@ export default class Game {
     this.Peasants.forEach(p => {
       this.MovePeasant(p)
       if (p.Position == HEART && dmg) {
-        console.log("SWORDED")
         dmg--
         p.Void()
       }
@@ -142,7 +138,6 @@ export default class Game {
     this.Peasants
       .filter(p => !p.OnFire && this.Peasants.find(x => x.OnFire && x.Position == p.Position))
       .forEach(p => {
-        console.log("CHAIN")
         p.Burn()
       })
 
@@ -159,11 +154,11 @@ export default class Game {
     this.Dragon.Move(dest)
     this.MoveEnemies()
     this.SpawnPeasants()
+    this.CheckDamage()
+    this.Burn()
     localStorage.setItem('state', JSON.stringify(this));
-    return this.CheckDamage()
   }
   Rage(AP){
-    console.log("rage", this)
     this.Dragon.Move()
     this.Burn()
     m.redraw()
@@ -172,7 +167,6 @@ export default class Game {
       setTimeout(()=>this.Rage(), 300)
   }
   Use(){
-    console.log("use")
     if (!this.Dragon.Hidden && this.Peasants.find(p => p.Position == this.Dragon.Position)?.Chomp()) {
       return false
     }
@@ -188,9 +182,9 @@ export default class Game {
   TileClick(Position){
     if (this.Dragon.Position == Position) {
       if (!this.Dragon.Hidden) {
-      //if (this.Tiles[Position].OnFire && this.Peasants.every(p => p.Position != Position)) return this.Use()
-      this.Burn()
-      return
+        //if (this.Tiles[Position].OnFire && this.Peasants.every(p => p.Position != Position)) return this.Use()
+        this.Burn()
+        return
       }
       this.Use()
     }
@@ -237,7 +231,6 @@ export default class Game {
     }
     this.Cottages.find(c => {
       if (c.Position == this.Dragon.Position) {
-        console.log(c.GetNeighbors(true))
       }
       return c.Position == this.Dragon.Position
       && (this.Dragon.OnFire || (

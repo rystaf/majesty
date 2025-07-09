@@ -20,7 +20,6 @@ class Entity extends Burnable {
         .find((x,i,s)=>Math.floor(s.length*r)==i)
     }
     if (dest == undefined) {
-      console.log("move", this, {options})
       return
     }
     let v = ["North", "South"]
@@ -34,14 +33,12 @@ class Entity extends Burnable {
     return this.Position
   }
   Burn(AP=4){
-    console.log("burn", this)
     this.OnFire = true
     this.AP = AP
     this.CanDiagonal = false
     return this.AP
   }
   Chomp(){
-    console.log("chomp")
     this.Position = HEART
     this.OnFire = false
     this.AP = 0
